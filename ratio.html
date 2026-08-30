@@ -345,6 +345,140 @@
     border-color:var(--amber) !important;
   }
 
+  #task-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #task-btn.on{ color:#7fe0a8; border-color:#276a45; }
+
+  #task-overlay{
+    position:fixed; inset:0;
+    background:rgba(2,6,12,0.72);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:10;
+  }
+  #task-overlay.open{ display:flex; }
+
+  #task-panel{
+    width:100%;
+    max-width:460px;
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:18px 18px 0 0;
+    padding:18px 18px 20px;
+    box-shadow:0 -10px 30px rgba(0,0,0,.5);
+    animation:slideup .22s ease-out;
+  }
+  #task-panel h3{
+    margin:0 0 4px;
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:2px;
+    color:#7fe0a8;
+    font-weight:600;
+  }
+  #task-panel .desc{
+    font-size:10px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin-bottom:12px;
+  }
+  #task-add-row{
+    display:flex; gap:8px;
+    margin-bottom:12px;
+  }
+  #task-input{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:10px 12px;
+  }
+  #task-input:focus{ outline:1px solid #276a45; }
+  #task-add-btn{
+    flex:0 0 auto;
+    background:#132a1e;
+    border:1px solid #276a45;
+    color:#7fe0a8;
+    border-radius:10px;
+    padding:0 16px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+  }
+  #task-list{
+    overflow-y:auto;
+    flex:1;
+    min-height:60px;
+  }
+  .task-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 2px;
+    border-bottom:1px solid var(--line);
+  }
+  .task-check{
+    flex:0 0 auto;
+    width:18px; height:18px;
+    border-radius:5px;
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color:#7fe0a8;
+    font-size:12px;
+  }
+  .task-item.done .task-check{ background:#132a1e; border-color:#276a45; }
+  .task-text{
+    flex:1;
+    font-size:12.5px;
+    color:var(--text);
+    word-break:break-word;
+  }
+  .task-item.done .task-text{ color:var(--text-dim); text-decoration:line-through; }
+  .task-del{
+    flex:0 0 auto;
+    background:none; border:none;
+    color:var(--text-dim);
+    font-size:14px;
+    cursor:pointer;
+    padding:2px 4px;
+  }
+  #task-empty{
+    color:var(--text-dim);
+    font-size:11px;
+    text-align:center;
+    padding:16px 0;
+  }
+  #task-close{
+    margin-top:14px;
+    align-self:flex-end;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    padding:8px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:none;
+    color:var(--text-dim);
+  }
+
   #hint{
     font-size:9.5px;
     color:var(--text-dim);
@@ -399,10 +533,24 @@
       </svg>
     </button>
     <button id="ctx-btn" title="状況を共有">📍 状況</button>
+    <button id="task-btn" title="タスク">📋 タスク</button>
   </div>
   <div id="status-text" style="margin-top:2px;">オフライン</div>
 
-  <div id="hint">マイクのボタンを押して話しかけてください。話しかけなくても、<b>「状況」</b>を共有しておくとRatioがそれを踏まえて応答します。</div>
+  <div id="hint">マイクのボタンを押して話しかけてください。「タスク追加、〇〇」「今日のタスクは？」のように話すと、AI連携なしでタスクを記録・読み上げます。</div>
+</div>
+
+<div id="task-overlay">
+  <div id="task-panel">
+    <h3>タスク</h3>
+    <div class="desc">ここに登録したタスクは、音声で「タスクを教えて」と聞くとRatioが読み上げます(AI連携不要)。</div>
+    <div id="task-add-row">
+      <input id="task-input" type="text" placeholder="新しいタスクを入力">
+      <button id="task-add-btn">追加</button>
+    </div>
+    <div id="task-list"></div>
+    <button id="task-close">閉じる</button>
+  </div>
 </div>
 
 <div id="ctx-overlay">
@@ -583,7 +731,162 @@
     transcript.scrollTop = transcript.scrollHeight;
   }
 
-  // --- Speech recognition setup ---
+  // ============ Task management (local only, no API cost) ============
+  const TASK_KEY = 'ratio_tasks_v1';
+  const taskBtn = document.getElementById('task-btn');
+  const taskOverlay = document.getElementById('task-overlay');
+  const taskCloseBtn = document.getElementById('task-close');
+  const taskInput = document.getElementById('task-input');
+  const taskAddBtn = document.getElementById('task-add-btn');
+  const taskListEl = document.getElementById('task-list');
+
+  function loadTasks(){
+    try{
+      const raw = localStorage.getItem(TASK_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveTasks(tasks){
+    try{ localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); }catch(e){}
+  }
+  let tasks = loadTasks();
+
+  function renderTasks(){
+    taskListEl.innerHTML = '';
+    if(tasks.length === 0){
+      taskListEl.innerHTML = '<div id="task-empty">タスクはまだありません</div>';
+      updateTaskBtnState();
+      return;
+    }
+    tasks.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'task-item' + (t.done ? ' done' : '');
+      row.innerHTML = `<div class="task-check">${t.done ? '✓' : ''}</div><div class="task-text"></div><button class="task-del">✕</button>`;
+      row.querySelector('.task-text').textContent = t.text;
+      row.querySelector('.task-check').addEventListener('click', () => {
+        t.done = !t.done;
+        saveTasks(tasks);
+        renderTasks();
+      });
+      row.querySelector('.task-del').addEventListener('click', () => {
+        tasks = tasks.filter(x => x.id !== t.id);
+        saveTasks(tasks);
+        renderTasks();
+      });
+      taskListEl.appendChild(row);
+    });
+    updateTaskBtnState();
+  }
+
+  function updateTaskBtnState(){
+    const pending = tasks.filter(t => !t.done).length;
+    taskBtn.classList.toggle('on', pending > 0);
+    taskBtn.textContent = pending > 0 ? `📋 タスク(${pending})` : '📋 タスク';
+  }
+
+  function addTask(text){
+    const t = { id: Date.now() + '-' + Math.random().toString(36).slice(2,7), text: text.trim(), done: false };
+    if(!t.text) return null;
+    tasks.push(t);
+    saveTasks(tasks);
+    renderTasks();
+    return t;
+  }
+
+  taskBtn.addEventListener('click', () => { taskOverlay.classList.add('open'); });
+  taskCloseBtn.addEventListener('click', () => taskOverlay.classList.remove('open'));
+  taskOverlay.addEventListener('click', (e) => { if(e.target === taskOverlay) taskOverlay.classList.remove('open'); });
+  taskAddBtn.addEventListener('click', () => {
+    if(taskInput.value.trim()){
+      addTask(taskInput.value);
+      taskInput.value = '';
+    }
+  });
+  taskInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter' && taskInput.value.trim()){
+      addTask(taskInput.value);
+      taskInput.value = '';
+    }
+  });
+
+  renderTasks();
+
+  // --- voice command parsing (handled 100% locally, no API call, no cost) ---
+  function tryHandleAsTaskCommand(said){
+    const s = said.trim();
+
+    // add: "タスクを追加して、〇〇" / "タスク追加 〇〇" / "〇〇をタスクに追加"
+    let m = s.match(/タスク(?:を)?追加(?:して)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      const t = addTask(m[1]);
+      return t ? `「${t.text}」をタスクに追加しました。` : 'タスクの内容が聞き取れませんでした。';
+    }
+    m = s.match(/(.+?)を?タスクに追加/);
+    if(m && m[1] && m[1].trim()){
+      const t = addTask(m[1]);
+      return t ? `「${t.text}」をタスクに追加しました。` : 'タスクの内容が聞き取れませんでした。';
+    }
+
+    // list: "今日のタスクは" / "タスク教えて" / "タスク一覧" / "タスクは何がある"
+    if(/タスク.*(教えて|一覧|何がある|何がありますか|は)\??$/.test(s) || /タスク(教えて|一覧)/.test(s)){
+      const pending = tasks.filter(t => !t.done);
+      if(pending.length === 0) return '現在、未完了のタスクはありません。';
+      const list = pending.map((t,i) => `${i+1}. ${t.text}`).join('、');
+      return `未完了のタスクが${pending.length}件あります。${list}`;
+    }
+
+    // complete: "〇〇を完了" / "〇〇終わった" / "〇〇できた"
+    m = s.match(/(.+?)(?:を)?(?:完了|終わった|終わりました|できた|できました)/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const found = tasks.find(t => !t.done && t.text.includes(needle));
+      if(found){
+        found.done = true;
+        saveTasks(tasks);
+        renderTasks();
+        return `「${found.text}」を完了にしました。`;
+      }
+    }
+
+    // delete: "〇〇を削除"
+    m = s.match(/(.+?)(?:を)?削除/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const idx = tasks.findIndex(t => t.text.includes(needle));
+      if(idx >= 0){
+        const removed = tasks[idx];
+        tasks.splice(idx,1);
+        saveTasks(tasks);
+        renderTasks();
+        return `「${removed.text}」を削除しました。`;
+      }
+    }
+
+    return null; // not a task command
+  }
+
+  // Set to true only after you deploy your own paid API proxy (see api/chat.js).
+  const AI_ENABLED = false;
+
+  async function handleVoiceInput(said){
+    const taskReply = tryHandleAsTaskCommand(said);
+    if(taskReply !== null){
+      addLine('jarvis', taskReply);
+      speak(taskReply);
+      setState('idle');
+      return;
+    }
+    if(AI_ENABLED){
+      await respondTo(said);
+      return;
+    }
+    const fallback = 'その内容はまだ理解できません。今はタスクの追加や確認のみお手伝いできます。例えば「タスク追加、資料を作る」のように話しかけてください。';
+    addLine('jarvis', fallback);
+    speak(fallback);
+    setState('idle');
+  }
+  // ============ end task management ============
+
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   let recognition = null;
   let srSupported = !!SR;
@@ -606,7 +909,7 @@
       const said = e.results[0][0].transcript;
       addLine('user', said);
       setState('thinking');
-      await respondTo(said);
+      await handleVoiceInput(said);
     };
   }
 
@@ -669,12 +972,10 @@
   async function respondTo(userText){
     history.push({role:'user', content:userText});
     try{
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "claude-sonnet-4-6",
-          max_tokens: 1000,
           system: buildSystemPrompt(),
           messages: history
         })
@@ -695,7 +996,7 @@
 
   // greet on load
   setTimeout(() => {
-    const greet = 'システム起動完了です。ご用件をどうぞ。';
+    const greet = 'システム起動完了です。今はタスクの登録と読み上げをお手伝いできます。「タスク追加、それから内容」と話しかけてください。';
     addLine('jarvis', greet);
     speak(greet);
   }, 500);

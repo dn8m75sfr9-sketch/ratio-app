@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RATIO</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#050810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ratio">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=2">
+<link rel="icon" href="./icon-192.png?v=2" type="image/png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+  :root{
+    --bg-0:#050810;
+    --bg-1:#0a1220;
+    --panel:#0d1b2e;
+    --line:#16324f;
+    --cyan:#4fd8ff;
+    --cyan-dim:#1c6b8a;
+    --amber:#ffb454;
+    --red:#ff5c5c;
+    --text:#d9ecf8;
+    --text-dim:#5c7c93;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #0e2438 0%, var(--bg-0) 55%),
+      var(--bg-0);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    overflow:hidden;
+  }
+  #app{
+    position:relative;
+    width:100%;height:100vh;min-height:560px;
+    display:flex;flex-direction:column;
+    align-items:center;
+    padding:22px 16px 16px;
+  }
+
+  /* scanline / grid atmosphere */
+  #app::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(79,216,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,216,255,0.035) 1px, transparent 1px);
+    background-size:34px 34px;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 72%);
+    pointer-events:none;
+  }
+
+  header{
+    display:flex; align-items:baseline; gap:10px;
+    z-index:2;
+  }
+  header .logo{
+    font-family:'Orbitron', sans-serif;
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:6px;
+    color:var(--cyan);
+    text-shadow:0 0 12px rgba(79,216,255,.55);
+  }
+  header .sub{
+    font-size:9px;
+    letter-spacing:3px;
+    color:var(--text-dim);
+  }
+
+  #stage{
+    position:relative;
+    flex:1;
+    width:100%;
+    max-width:420px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+  }
+
+  #core-wrap{
+    position:relative;
+    width:min(78vw,260px);
+    height:min(78vw,260px);
+    cursor:pointer;
+    border-radius:50%;
+    transition:transform .15s;
+  }
+  #core-wrap:active{ transform:scale(0.98); }
+  #core-wrap.listening{
+    animation:pulse-ring-core 1.4s infinite;
+  }
+  @keyframes pulse-ring-core{
+    0%{ box-shadow:0 0 0 0 rgba(79,216,255,.35); }
+    70%{ box-shadow:0 0 0 22px rgba(79,216,255,0); }
+    100%{ box-shadow:0 0 0 0 rgba(79,216,255,0); }
+  }
+  svg#core{ width:100%; height:100%; overflow:visible; pointer-events:none; }
+
+  .ring{ fill:none; stroke:var(--cyan-dim); }
+  .ring-active{ stroke:var(--cyan); filter:drop-shadow(0 0 6px rgba(79,216,255,.8)); }
+  .tick{ stroke:var(--line); stroke-width:1; }
+
+  #core-inner{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+  }
+  #amp-canvas{ position:absolute; inset:0; }
+
+  #core-label{
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--cyan);
+    text-shadow:0 0 10px rgba(79,216,255,.6);
+    z-index:3;
+    text-align:center;
+    pointer-events:none;
+    transition:opacity .2s;
+  }
+  #core-sub{
+    font-size:9px;
+    color:var(--text-dim);
+    letter-spacing:2px;
+    margin-top:4px;
+    z-index:3;
+  }
+
+  #transcript{
+    z-index:2;
+    width:100%;
+    max-width:460px;
+    min-height:120px;
+    max-height:34vh;
+    overflow-y:auto;
+    padding:0 4px 8px;
+    margin-top:6px;
+  }
+  #transcript::-webkit-scrollbar{ width:4px; }
+  #transcript::-webkit-scrollbar-thumb{ background:var(--cyan-dim); }
+
+  .line{
+    display:flex; gap:8px;
+    font-size:12.5px;
+    line-height:1.55;
+    margin:9px 0;
+    animation:rise .25s ease-out;
+  }
+  @keyframes rise{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .who{
+    flex:0 0 auto;
+    font-family:'Orbitron', sans-serif;
+    font-size:9px;
+    letter-spacing:1px;
+    padding-top:2px;
+    width:44px;
+  }
+  .line.user .who{ color:var(--amber); }
+  .line.jarvis .who{ color:var(--cyan); }
+  .line .txt{ color:var(--text); flex:1; word-break:break-word; }
+  .line.user .txt{ color:#c9d6de; }
+
+  #controls{
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-top:8px;
+    padding-bottom:6px;
+  }
+
+  #status-text{
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--text-dim);
+    min-width:120px;
+  }
+  #status-text.err{ color:var(--red); }
+
+  #voice-toggle{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #voice-toggle.on{ color:var(--cyan); border-color:var(--cyan-dim); }
+
+  @keyframes slideup{ from{transform:translateY(100%);} to{transform:translateY(0);} }
+
+  #task-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #task-btn.on{ color:#7fe0a8; border-color:#276a45; }
+
+  #task-overlay{
+    position:fixed; inset:0;
+    background:rgba(2,6,12,0.72);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:10;
+  }
+  #task-overlay.open{ display:flex; }
+
+  #task-panel{
+    width:100%;
+    max-width:460px;
+    max-height:80vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:18px 18px 0 0;
+    padding:18px 18px 20px;
+    box-shadow:0 -10px 30px rgba(0,0,0,.5);
+    animation:slideup .22s ease-out;
+  }
+  #task-panel h3{
+    margin:0 0 4px;
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:2px;
+    color:#7fe0a8;
+    font-weight:600;
+  }
+  #task-panel .desc{
+    font-size:10px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin-bottom:12px;
+  }
+  #task-add-row{
+    display:flex; gap:8px;
+    margin-bottom:12px;
+  }
+  #task-input{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:10px 12px;
+  }
+  #task-input:focus{ outline:1px solid #276a45; }
+  #task-add-date{
+    flex:0 0 auto;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:10px 8px;
+  }
+  #task-add-btn{
+    flex:0 0 auto;
+    background:#132a1e;
+    border:1px solid #276a45;
+    color:#7fe0a8;
+    border-radius:10px;
+    padding:0 16px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+  }
+  #task-list{
+    overflow-y:auto;
+    flex:1;
+    min-height:60px;
+  }
+  .task-item{
+    display:flex; align-items:center; gap:10px;
+    padding:9px 2px;
+    border-bottom:1px solid var(--line);
+  }
+  .task-check{
+    flex:0 0 auto;
+    width:18px; height:18px;
+    border-radius:5px;
+    border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer;
+    color:#7fe0a8;
+    font-size:12px;
+  }
+  .task-item.done .task-check{ background:#132a1e; border-color:#276a45; }
+  .task-text{
+    flex:1;
+    font-size:12.5px;
+    color:var(--text);
+    word-break:break-word;
+  }
+  .task-item.done .task-text{ color:var(--text-dim); text-decoration:line-through; }
+  .task-del{
+    flex:0 0 auto;
+    background:none; border:none;
+    color:var(--text-dim);
+    font-size:14px;
+    cursor:pointer;
+    padding:2px 4px;
+  }
+  #task-empty{
+    color:var(--text-dim);
+    font-size:11px;
+    text-align:center;
+    padding:16px 0;
+  }
+  #task-close{
+    margin-top:14px;
+    align-self:flex-end;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    padding:8px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:none;
+    color:var(--text-dim);
+  }
+
+  #text-row{
+    display:flex; gap:8px;
+    width:100%;
+    max-width:460px;
+    margin-top:10px;
+    z-index:2;
+  }
+  #text-input{
+    flex:1;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    padding:10px 14px;
+  }
+  #text-input:focus{ outline:1px solid var(--cyan-dim); }
+  #text-send{
+    flex:0 0 auto;
+    background:radial-gradient(circle at 50% 40%, #0f2740, #071320);
+    border:1px solid var(--cyan-dim);
+    color:var(--cyan);
+    border-radius:12px;
+    padding:0 18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px;
+    cursor:pointer;
+  }
+
+  #cal-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #cal-btn.on{ color:#ff8a8a; border-color:#7a2b2b; }
+
+  #cal-overlay{
+    position:fixed; inset:0;
+    background:rgba(2,6,12,0.35);
+    display:none;
+    align-items:flex-start;
+    justify-content:flex-end;
+    z-index:11;
+  }
+  #cal-overlay.open{ display:flex; }
+
+  /* Always docked to the top-right corner, regardless of device orientation
+     (iOS Safari does not support forcing landscape layout). */
+  #cal-panel{
+    width:100%;
+    max-width:300px;
+    max-height:80vh;
+    overflow-y:auto;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:14px 14px 16px;
+    margin:14px 14px 0 0;
+    box-shadow:0 10px 30px rgba(0,0,0,.5);
+    animation:fadein .18s ease-out;
+  }
+  @keyframes fadein{ from{opacity:0; transform:translateY(-6px);} to{opacity:1; transform:translateY(0);} }
+
+  #cal-head{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:10px;
+  }
+  #cal-head h3{
+    margin:0;
+    font-family:'Orbitron', sans-serif;
+    font-size:12px;
+    letter-spacing:2px;
+    color:#ff9a9a;
+    font-weight:600;
+  }
+  #cal-nav{ display:flex; gap:6px; }
+  #cal-nav button{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    width:26px; height:26px;
+    border-radius:8px;
+    font-size:12px;
+    cursor:pointer;
+  }
+  #cal-grid{
+    display:grid;
+    grid-template-columns:repeat(7, 1fr);
+    gap:3px;
+    margin-bottom:12px;
+  }
+  .cal-dow{
+    text-align:center;
+    font-size:9px;
+    color:var(--text-dim);
+    letter-spacing:.5px;
+    padding-bottom:4px;
+  }
+  .cal-day{
+    position:relative;
+    aspect-ratio:1;
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px;
+    color:var(--text);
+    border-radius:8px;
+    cursor:pointer;
+    background:var(--panel);
+  }
+  .cal-day.empty{ background:transparent; cursor:default; }
+  .cal-day.today{ outline:1px solid var(--cyan); color:var(--cyan); }
+  .cal-day.selected{ background:#20344a; outline:1px solid var(--cyan-dim); }
+  .cal-day .dot{
+    position:absolute;
+    bottom:3px;
+    width:5px; height:5px;
+    border-radius:50%;
+    background:#ff5c5c;
+    box-shadow:0 0 4px rgba(255,92,92,.8);
+  }
+  #cal-selected-label{
+    font-size:11px;
+    color:var(--text-dim);
+    letter-spacing:.5px;
+    margin-bottom:8px;
+  }
+  #cal-event-list{ margin-bottom:12px; }
+  .cal-event-item{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 2px;
+    border-bottom:1px solid var(--line);
+    font-size:12px;
+  }
+  .cal-event-item .t{ color:#ff9a9a; flex:0 0 auto; font-size:10.5px; }
+  .cal-event-item .n{ flex:1; color:var(--text); word-break:break-word; }
+  .cal-event-item .x{
+    flex:0 0 auto; background:none; border:none; color:var(--text-dim);
+    font-size:13px; cursor:pointer;
+  }
+  #cal-empty-note{ font-size:10.5px; color:var(--text-dim); padding:4px 0 10px; }
+  #cal-add-row{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
+  #cal-add-title{
+    flex:1 1 100%;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:8px 10px;
+  }
+  #cal-add-time, #cal-add-end-time{
+    flex:1 1 auto;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:8px 10px;
+  }
+  .cal-range-sep{
+    flex:0 0 auto;
+    display:flex; align-items:center;
+    color:var(--text-dim);
+    font-size:11px;
+  }
+  #cal-add-end-date{
+    flex:1 1 100%;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:9px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:8px 10px;
+  }
+  .cal-field-label{
+    flex:1 1 100%;
+    font-size:9.5px;
+    color:var(--text-dim);
+    letter-spacing:.5px;
+    margin-top:2px;
+  }
+  #cal-allday-label{
+    flex:1 1 100%;
+    display:flex; align-items:center; gap:6px;
+    font-size:11px;
+    color:var(--text-dim);
+    margin-top:4px;
+    cursor:pointer;
+  }
+  #cal-allday-label input{ accent-color:#ff5c5c; }
+  #cal-add-time.disabled-look, #cal-add-end-time.disabled-look{ opacity:.4; }
+  #cal-add-btn{
+    flex:0 0 auto;
+    background:#3a1414;
+    border:1px solid #7a2b2b;
+    color:#ff9a9a;
+    border-radius:9px;
+    padding:0 14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+  }
+  #cal-close{
+    margin-top:10px;
+    width:100%;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    padding:9px 0;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:none;
+    color:var(--text-dim);
+  }
+
+  #hint{
+    font-size:9.5px;
+    color:var(--text-dim);
+    text-align:center;
+    max-width:300px;
+    margin-top:10px;
+    line-height:1.6;
+    z-index:2;
+  }
+  #hint b{ color:var(--amber); font-weight:500; }
+
+  @media (prefers-reduced-motion: reduce){
+    #core-wrap.listening{ animation:none; }
+    .line{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">R A T I O</div>
+    <div class="sub">VOICE INTERFACE</div>
+  </header>
+
+  <div id="stage">
+    <div id="core-wrap" role="button" title="タップして話す">
+      <svg id="core" viewBox="0 0 260 260">
+        <circle class="ring" id="ringOuter" cx="130" cy="130" r="118" stroke-width="1"/>
+        <circle class="ring" id="ringMid" cx="130" cy="130" r="96" stroke-width="1" stroke-dasharray="2 6"/>
+        <circle class="ring ring-active" id="ringInner" cx="130" cy="130" r="72" stroke-width="1.5"/>
+        <g id="ticks"></g>
+      </svg>
+      <canvas id="amp-canvas" width="260" height="260"></canvas>
+      <div id="core-inner">
+        <div id="core-label">STANDBY</div>
+        <div id="core-sub">tap to speak</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="transcript"></div>
+
+  <div id="controls">
+    <button id="voice-toggle" class="on" title="音声読み上げ">🔊 音声ON</button>
+    <button id="task-btn" title="タスク">📋 タスク</button>
+    <button id="cal-btn" title="予定">📅 予定</button>
+  </div>
+  <div id="status-text" style="margin-top:2px;">オフライン</div>
+
+  <div id="text-row">
+    <input id="text-input" type="text" placeholder="話す代わりにここに入力(例: タスク追加、資料を作る)">
+    <button id="text-send">送信</button>
+  </div>
+
+  <div id="hint">マイクが使えない端末(iPhone Safariなど)では、上のテキスト欄から話しかけてください。「タスク追加、〇〇」「今日のタスクは？」のように入力するとRatioが声で返事します。</div>
+</div>
+
+<div id="cal-overlay">
+  <div id="cal-panel">
+    <div id="cal-head">
+      <h3 id="cal-month-label">2026年8月</h3>
+      <div id="cal-nav">
+        <button id="cal-prev">‹</button>
+        <button id="cal-next">›</button>
+      </div>
+    </div>
+    <div id="cal-grid"></div>
+    <div id="cal-selected-label"></div>
+    <div id="cal-event-list"></div>
+    <div id="cal-add-row">
+      <input id="cal-add-title" type="text" placeholder="予定のタイトル">
+      <label id="cal-allday-label"><input type="checkbox" id="cal-add-allday"> 終日(時刻指定なし)</label>
+      <div class="cal-field-label">時刻(範囲指定は任意)</div>
+      <input id="cal-add-time" type="time" step="300" value="06:00">
+      <div class="cal-range-sep">〜</div>
+      <input id="cal-add-end-time" type="time" step="300" value="18:00">
+      <div class="cal-field-label">終了日(複数日にまたがる場合のみ)</div>
+      <input id="cal-add-end-date" type="date">
+      <button id="cal-add-btn">追加</button>
+    </div>
+    <button id="cal-close">閉じる</button>
+  </div>
+</div>
+
+<div id="task-overlay">
+  <div id="task-panel">
+    <h3>タスク</h3>
+    <div class="desc">ここに登録したタスクは、音声で「タスクを教えて」と聞くとRatioが読み上げます(AI連携不要)。日付を指定すると、その日の予定(終日)にも自動で反映されます。</div>
+    <div id="task-add-row">
+      <input id="task-input" type="text" placeholder="新しいタスクを入力">
+      <input id="task-add-date" type="date">
+      <button id="task-add-btn">追加</button>
+    </div>
+    <div id="task-list"></div>
+    <button id="task-close">閉じる</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const coreWrap = document.getElementById('core-wrap');
+  const statusText = document.getElementById('status-text');
+  const coreLabel = document.getElementById('core-label');
+  const coreSub = document.getElementById('core-sub');
+  const transcript = document.getElementById('transcript');
+  const voiceToggle = document.getElementById('voice-toggle');
+  const ringInner = document.getElementById('ringInner');
+  const ticksGroup = document.getElementById('ticks');
+  const canvas = document.getElementById('amp-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let voiceOn = true;
+  let listening = false;
+  let speaking = false;
+  let history = [];
+
+  // build tick marks around outer ring
+  const N = 60;
+  for(let i=0;i<N;i++){
+    const a = (i/N) * Math.PI*2;
+    const r1 = 106, r2 = 112;
+    const x1 = 130 + r1*Math.cos(a), y1 = 130 + r1*Math.sin(a);
+    const x2 = 130 + r2*Math.cos(a), y2 = 130 + r2*Math.sin(a);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('class','tick');
+    ticksGroup.appendChild(line);
+  }
+
+  // slow rotation of outer ring
+  let rot = 0;
+  function animateRing(){
+    rot += 0.15;
+    document.getElementById('ringOuter').style.transformOrigin='130px 130px';
+    document.getElementById('ringOuter').style.transform = `rotate(${rot}deg)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // amplitude visual (simulated pulse driven by listening/speaking state)
+  let amp = 0, target = 0, t = 0;
+  function drawAmp(){
+    t += 0.06;
+    amp += (target - amp) * 0.12;
+    ctx.clearRect(0,0,260,260);
+    const bars = 48;
+    for(let i=0;i<bars;i++){
+      const a = (i/bars) * Math.PI*2;
+      const wig = (listening||speaking) ? (Math.sin(t*3 + i*0.5) * 0.5 + 0.5) : 0.15;
+      const len = 6 + amp * 22 * wig + (listening||speaking ? 4 : 0);
+      const r1 = 82;
+      const r2 = r1 + len;
+      const x1 = 130 + r1*Math.cos(a), y1 = 130 + r1*Math.sin(a);
+      const x2 = 130 + r2*Math.cos(a), y2 = 130 + r2*Math.sin(a);
+      ctx.strokeStyle = (listening||speaking) ? 'rgba(79,216,255,'+(0.35+wig*0.5)+')' : 'rgba(79,216,255,0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.stroke();
+    }
+    requestAnimationFrame(drawAmp);
+  }
+  drawAmp();
+
+  function setState(mode){
+    // mode: idle | listening | thinking | speaking | error
+    listening = mode === 'listening';
+    speaking = mode === 'speaking';
+    target = (mode==='listening') ? 1 : (mode==='speaking' ? 0.8 : (mode==='thinking' ? 0.4 : 0));
+    coreWrap.classList.toggle('listening', mode==='listening');
+    statusText.classList.toggle('err', mode==='error');
+    const map = {
+      idle:['STANDBY','tap to speak','オフライン'],
+      listening:['LISTENING','聞いています…','音声認識中'],
+      thinking:['PROCESSING','解析中…','応答を生成中'],
+      speaking:['RESPONDING','応答中…','RATIOが応答中'],
+      error:['ERROR','エラーが発生','エラー']
+    };
+    const [l,s,st] = map[mode] || map.idle;
+    coreLabel.textContent = l;
+    coreSub.textContent = s;
+    statusText.textContent = st;
+  }
+  setState('idle');
+
+  function addLine(who, text){
+    const div = document.createElement('div');
+    div.className = 'line ' + (who==='user' ? 'user' : 'jarvis');
+    div.innerHTML = `<div class="who">${who==='user' ? 'YOU' : 'RATIO'}</div><div class="txt"></div>`;
+    div.querySelector('.txt').textContent = text;
+    transcript.appendChild(div);
+    transcript.scrollTop = transcript.scrollHeight;
+  }
+
+  // ============ Task management (local only, no API cost) ============
+  const TASK_KEY = 'ratio_tasks_v1';
+  const taskBtn = document.getElementById('task-btn');
+  const taskOverlay = document.getElementById('task-overlay');
+  const taskCloseBtn = document.getElementById('task-close');
+  const taskInput = document.getElementById('task-input');
+  const taskAddDate = document.getElementById('task-add-date');
+  const taskAddBtn = document.getElementById('task-add-btn');
+  const taskListEl = document.getElementById('task-list');
+
+  function loadTasks(){
+    try{
+      const raw = localStorage.getItem(TASK_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveTasks(tasks){
+    try{ localStorage.setItem(TASK_KEY, JSON.stringify(tasks)); }catch(e){}
+  }
+  let tasks = loadTasks();
+
+  function renderTasks(){
+    taskListEl.innerHTML = '';
+    if(tasks.length === 0){
+      taskListEl.innerHTML = '<div id="task-empty">タスクはまだありません</div>';
+      updateTaskBtnState();
+      return;
+    }
+    tasks.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'task-item' + (t.done ? ' done' : '');
+      const dateLabel = t.date ? `<span style="color:var(--text-dim);font-size:10px;margin-left:6px;">${t.date.slice(5).replace('-','/')}</span>` : '';
+      row.innerHTML = `<div class="task-check">${t.done ? '✓' : ''}</div><div class="task-text"></div>${dateLabel}<button class="task-del">✕</button>`;
+      row.querySelector('.task-text').textContent = t.text;
+      row.querySelector('.task-check').addEventListener('click', () => {
+        t.done = !t.done;
+        saveTasks(tasks);
+        renderTasks();
+      });
+      row.querySelector('.task-del').addEventListener('click', () => {
+        tasks = tasks.filter(x => x.id !== t.id);
+        saveTasks(tasks);
+        renderTasks();
+        if(t.calEventId){
+          calEvents = calEvents.filter(e => e.id !== t.calEventId);
+          saveCalEvents(calEvents);
+          renderCalGrid();
+          renderCalSelectedEvents();
+          updateCalBtnState();
+        }
+      });
+      taskListEl.appendChild(row);
+    });
+    updateTaskBtnState();
+  }
+
+  function updateTaskBtnState(){
+    const pending = tasks.filter(t => !t.done).length;
+    taskBtn.classList.toggle('on', pending > 0);
+    taskBtn.textContent = pending > 0 ? `📋 タスク(${pending})` : '📋 タスク';
+  }
+
+  function addTask(text, dateStr){
+    const t = { id: Date.now() + '-' + Math.random().toString(36).slice(2,7), text: text.trim(), done: false, date: dateStr || null, calEventId: null };
+    if(!t.text) return null;
+    if(dateStr){
+      const ev = addCalEvent(dateStr, '', t.text, null, '');
+      if(ev){
+        t.calEventId = ev.id;
+        updateCalBtnState();
+      }
+    }
+    tasks.push(t);
+    saveTasks(tasks);
+    renderTasks();
+    return t;
+  }
+
+  taskBtn.addEventListener('click', () => { taskOverlay.classList.add('open'); });
+  taskCloseBtn.addEventListener('click', () => taskOverlay.classList.remove('open'));
+  taskOverlay.addEventListener('click', (e) => { if(e.target === taskOverlay) taskOverlay.classList.remove('open'); });
+  function submitTaskAddForm(){
+    if(taskInput.value.trim()){
+      addTask(taskInput.value, taskAddDate.value);
+      taskInput.value = '';
+      taskAddDate.value = '';
+    }
+  }
+  taskAddBtn.addEventListener('click', submitTaskAddForm);
+  taskInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') submitTaskAddForm();
+  });
+
+  renderTasks();
+
+  // --- voice command parsing (handled 100% locally, no API call, no cost) ---
+  function tryHandleAsTaskCommand(said){
+    const s = said.trim();
+
+    // add: "タスクを追加して、〇〇" / "タスク追加 〇〇" / "〇〇をタスクに追加"
+    let m = s.match(/タスク(?:を)?追加(?:して)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      const t = addTask(m[1]);
+      return t ? `「${t.text}」をタスクに追加しました。` : 'タスクの内容が聞き取れませんでした。';
+    }
+    m = s.match(/(.+?)を?タスクに追加/);
+    if(m && m[1] && m[1].trim()){
+      const t = addTask(m[1]);
+      return t ? `「${t.text}」をタスクに追加しました。` : 'タスクの内容が聞き取れませんでした。';
+    }
+
+    // list: "今日のタスクは" / "タスク教えて" / "タスク一覧" / "タスクは何がある"
+    if(/タスク.*(教えて|一覧|何がある|何がありますか|は)\??$/.test(s) || /タスク(教えて|一覧)/.test(s)){
+      const pending = tasks.filter(t => !t.done);
+      if(pending.length === 0) return '現在、未完了のタスクはありません。';
+      const list = pending.map((t,i) => `${i+1}. ${t.text}`).join('、');
+      return `未完了のタスクが${pending.length}件あります。${list}`;
+    }
+
+    // complete: "〇〇を完了" / "〇〇終わった" / "〇〇できた"
+    m = s.match(/(.+?)(?:を)?(?:完了|終わった|終わりました|できた|できました)/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const found = tasks.find(t => !t.done && t.text.includes(needle));
+      if(found){
+        found.done = true;
+        saveTasks(tasks);
+        renderTasks();
+        return `「${found.text}」を完了にしました。`;
+      }
+    }
+
+    // delete: "〇〇を削除"
+    m = s.match(/(.+?)(?:を)?削除/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const idx = tasks.findIndex(t => t.text.includes(needle));
+      if(idx >= 0){
+        const removed = tasks[idx];
+        tasks.splice(idx,1);
+        saveTasks(tasks);
+        renderTasks();
+        return `「${removed.text}」を削除しました。`;
+      }
+    }
+
+    return null; // not a task command
+  }
+
+  // Set to true only after you deploy your own paid API proxy (see api/chat.js).
+  const AI_ENABLED = false;
+
+  async function handleVoiceInput(said){
+    const taskReply = tryHandleAsTaskCommand(said);
+    if(taskReply !== null){
+      addLine('jarvis', taskReply);
+      speak(taskReply);
+      setState('idle');
+      return;
+    }
+    const calReply = tryHandleAsCalendarCommand(said);
+    if(calReply !== null){
+      addLine('jarvis', calReply);
+      speak(calReply);
+      setState('idle');
+      return;
+    }
+    if(AI_ENABLED){
+      await respondTo(said);
+      return;
+    }
+    const fallback = 'その内容はまだ理解できません。今はタスクや予定の追加・確認のみお手伝いできます。例えば「タスク追加、資料を作る」「今日の予定は？」のように話しかけてください。';
+    addLine('jarvis', fallback);
+    speak(fallback);
+    setState('idle');
+  }
+  // ============ end task management ============
+
+  // ============ calendar (local only, Monday-start month view) ============
+  const CAL_KEY = 'ratio_calendar_events_v1';
+  const calBtn = document.getElementById('cal-btn');
+  const calOverlay = document.getElementById('cal-overlay');
+  const calCloseBtn = document.getElementById('cal-close');
+  const calPrevBtn = document.getElementById('cal-prev');
+  const calNextBtn = document.getElementById('cal-next');
+  const calMonthLabel = document.getElementById('cal-month-label');
+  const calGrid = document.getElementById('cal-grid');
+  const calSelectedLabel = document.getElementById('cal-selected-label');
+  const calEventList = document.getElementById('cal-event-list');
+  const calAddTitle = document.getElementById('cal-add-title');
+  const calAddTime = document.getElementById('cal-add-time');
+  const calAddEndTime = document.getElementById('cal-add-end-time');
+  const calAddEndDate = document.getElementById('cal-add-end-date');
+  const calAddAllday = document.getElementById('cal-add-allday');
+  const calAddBtn = document.getElementById('cal-add-btn');
+
+  function loadCalEvents(){
+    try{
+      const raw = localStorage.getItem(CAL_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveCalEvents(ev){
+    try{ localStorage.setItem(CAL_KEY, JSON.stringify(ev)); }catch(e){}
+  }
+  let calEvents = loadCalEvents(); // { id, date:'YYYY-MM-DD', time:'HH:MM'|null, title }
+
+  function ymd(d){
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  const today = new Date();
+  let calViewYear = today.getFullYear();
+  let calViewMonth = today.getMonth(); // 0-indexed
+  let calSelectedDate = ymd(today);
+
+  function eventsOn(dateStr){
+    return calEvents
+      .filter(e => dateStr >= e.date && dateStr <= (e.endDate || e.date))
+      .sort((a,b) => (a.time||'99:99').localeCompare(b.time||'99:99'));
+  }
+
+  function renderCalGrid(){
+    calMonthLabel.textContent = `${calViewYear}年${calViewMonth+1}月`;
+    calGrid.innerHTML = '';
+    const dows = ['月','火','水','木','金','土','日'];
+    dows.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'cal-dow';
+      el.textContent = d;
+      calGrid.appendChild(el);
+    });
+
+    const firstOfMonth = new Date(calViewYear, calViewMonth, 1);
+    // JS getDay(): 0=Sun..6=Sat. Convert to Monday-start index: 0=Mon..6=Sun
+    const startOffset = (firstOfMonth.getDay() + 6) % 7;
+    const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+
+    for(let i=0;i<startOffset;i++){
+      const el = document.createElement('div');
+      el.className = 'cal-day empty';
+      calGrid.appendChild(el);
+    }
+    for(let day=1; day<=daysInMonth; day++){
+      const dateObj = new Date(calViewYear, calViewMonth, day);
+      const dateStr = ymd(dateObj);
+      const el = document.createElement('div');
+      el.className = 'cal-day';
+      if(dateStr === ymd(today)) el.classList.add('today');
+      if(dateStr === calSelectedDate) el.classList.add('selected');
+      el.innerHTML = `${day}`;
+      if(eventsOn(dateStr).length > 0){
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        el.appendChild(dot);
+      }
+      el.addEventListener('click', () => {
+        calSelectedDate = dateStr;
+        renderCalGrid();
+        renderCalSelectedEvents();
+      });
+      calGrid.appendChild(el);
+    }
+  }
+
+  function renderCalSelectedEvents(){
+    const d = new Date(calSelectedDate + 'T00:00:00');
+    const dows = ['日','月','火','水','木','金','土'];
+    calSelectedLabel.textContent = `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日(${dows[d.getDay()]})の予定`;
+    const evs = eventsOn(calSelectedDate);
+    calEventList.innerHTML = '';
+    if(evs.length === 0){
+      calEventList.innerHTML = '<div id="cal-empty-note">予定はありません</div>';
+      return;
+    }
+    evs.forEach(ev => {
+      const row = document.createElement('div');
+      row.className = 'cal-event-item';
+      let timeLabel = ev.time ? (ev.endTime ? `${ev.time}〜${ev.endTime}` : ev.time) : '終日';
+      if(ev.endDate && ev.endDate !== ev.date){
+        const sd = new Date(ev.date+'T00:00:00'), ed = new Date(ev.endDate+'T00:00:00');
+        timeLabel += ` (${sd.getMonth()+1}/${sd.getDate()}〜${ed.getMonth()+1}/${ed.getDate()})`;
+      }
+      row.innerHTML = `<div class="t">${timeLabel}</div><div class="n"></div><button class="x">✕</button>`;
+      row.querySelector('.n').textContent = ev.title;
+      row.querySelector('.x').addEventListener('click', () => {
+        calEvents = calEvents.filter(e => e.id !== ev.id);
+        saveCalEvents(calEvents);
+        renderCalGrid();
+        renderCalSelectedEvents();
+      });
+      calEventList.appendChild(row);
+    });
+  }
+
+  function addCalEvent(dateStr, time, title, endDate, endTime){
+    if(!title || !title.trim()) return null;
+    const ev = {
+      id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
+      date: dateStr,
+      time: time || null,
+      endDate: (endDate && endDate !== dateStr) ? endDate : null,
+      endTime: (time && endTime) ? endTime : null,
+      title: title.trim()
+    };
+    calEvents.push(ev);
+    saveCalEvents(calEvents);
+    renderCalGrid();
+    renderCalSelectedEvents();
+    return ev;
+  }
+
+  calBtn.addEventListener('click', () => {
+    calSelectedDate = ymd(today);
+    calViewYear = today.getFullYear();
+    calViewMonth = today.getMonth();
+    calAddTime.value = '06:00';
+    calAddEndTime.value = '18:00';
+    calAddAllday.checked = false;
+    updateAlldayLook();
+    renderCalGrid();
+    renderCalSelectedEvents();
+    calOverlay.classList.add('open');
+  });
+  calCloseBtn.addEventListener('click', () => calOverlay.classList.remove('open'));
+  calOverlay.addEventListener('click', (e) => { if(e.target === calOverlay) calOverlay.classList.remove('open'); });
+
+  calPrevBtn.addEventListener('click', () => {
+    calViewMonth--;
+    if(calViewMonth < 0){ calViewMonth = 11; calViewYear--; }
+    renderCalGrid();
+  });
+  calNextBtn.addEventListener('click', () => {
+    calViewMonth++;
+    if(calViewMonth > 11){ calViewMonth = 0; calViewYear++; }
+    renderCalGrid();
+  });
+
+  function updateAlldayLook(){
+    const off = calAddAllday.checked;
+    calAddTime.disabled = off;
+    calAddEndTime.disabled = off;
+    calAddTime.classList.toggle('disabled-look', off);
+    calAddEndTime.classList.toggle('disabled-look', off);
+  }
+  calAddAllday.addEventListener('change', updateAlldayLook);
+
+  function submitCalAddForm(){
+    const allday = calAddAllday.checked;
+    const startTime = allday ? '' : calAddTime.value;
+    const endTime = allday ? '' : calAddEndTime.value;
+    const t = addCalEvent(calSelectedDate, startTime, calAddTitle.value, calAddEndDate.value, endTime);
+    if(t){
+      calAddTitle.value = '';
+      calAddTime.value = '06:00';
+      calAddEndTime.value = '18:00';
+      calAddEndDate.value = '';
+      calAddAllday.checked = false;
+      updateAlldayLook();
+    }
+  }
+  calAddBtn.addEventListener('click', submitCalAddForm);
+  calAddTitle.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') submitCalAddForm();
+  });
+
+  function updateCalBtnState(){
+    const todayCount = eventsOn(ymd(today)).length;
+    calBtn.classList.toggle('on', todayCount > 0);
+  }
+  updateCalBtnState();
+
+  // voice/text command support: "今日の予定は" / "明日の予定は" / "予定を教えて"
+  // parse Japanese time expressions like "15時30分" / "15時" / "午後3時" / "15:30" from the start of a string
+  function extractSpokenTime(s){
+    let m = s.match(/^\s*(午前|午後)?\s*(\d{1,2})時(?:(\d{1,2})分)?\s*[、,。]?\s*(.*)$/);
+    if(m){
+      let hour = parseInt(m[2], 10);
+      const minute = m[3] ? parseInt(m[3], 10) : 0;
+      if(m[1] === '午後' && hour < 12) hour += 12;
+      if(m[1] === '午前' && hour === 12) hour = 0;
+      if(hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59){
+        return { time: `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`, rest: m[4].trim() };
+      }
+    }
+    m = s.match(/^\s*(\d{1,2}):(\d{2})\s*[、,。]?\s*(.*)$/);
+    if(m){
+      return { time: `${m[1].padStart(2,'0')}:${m[2]}`, rest: m[3].trim() };
+    }
+    return null;
+  }
+
+  // "9時から18時" / "9時30分〜18時" / "9:00〜18:00" -> { start, end, rest }
+  function extractTimeRange(s){
+    const m = s.match(/^\s*((?:午前|午後)?\s*\d{1,2}(?:時(?:\d{1,2}分)?|:\d{2}))\s*(?:から|〜|~)\s*((?:午前|午後)?\s*\d{1,2}(?:時(?:\d{1,2}分)?|:\d{2}))\s*[、,。]?\s*(.*)$/);
+    if(!m) return null;
+    const start = extractSpokenTime(m[1] + '、');
+    const end = extractSpokenTime(m[2] + '、');
+    if(start && end){
+      return { start: start.time, end: end.time, rest: m[3].trim() };
+    }
+    return null;
+  }
+
+  function parseSpokenDateToken(tok){
+    if(tok === '今日') return ymd(today);
+    if(tok === '明日'){ const d = new Date(today); d.setDate(d.getDate()+1); return ymd(d); }
+    if(tok === '明後日'){ const d = new Date(today); d.setDate(d.getDate()+2); return ymd(d); }
+    const m = tok.match(/^(\d{1,2})月(\d{1,2})日$/);
+    if(m){
+      let d = new Date(today.getFullYear(), parseInt(m[1],10)-1, parseInt(m[2],10));
+      // if that date already passed this year by more than a month, assume next year
+      return ymd(d);
+    }
+    return null;
+  }
+
+  // "8月1日から8月3日まで" / "今日から明日まで" -> { start, end, rest }
+  function extractDateRange(s){
+    const tokenPattern = '(?:今日|明日|明後日|\\d{1,2}月\\d{1,2}日)';
+    const re = new RegExp(`^\\s*(${tokenPattern})\\s*(?:から|〜|~)\\s*(${tokenPattern})\\s*まで\\s*[、,。]?\\s*(.*)$`);
+    const m = s.match(re);
+    if(!m) return null;
+    const start = parseSpokenDateToken(m[1]);
+    const end = parseSpokenDateToken(m[2]);
+    if(start && end){
+      return { start, end, rest: m[3].trim() };
+    }
+    return null;
+  }
+
+  function tryHandleAsCalendarCommand(said){
+    const s = said.trim();
+
+    // add: "予定の追加、15時、会議" / "予定追加 9時から18時 出張" / "予定追加 8月1日から8月3日まで 出張"
+    let m = s.match(/予定(?:の)?を?追加(?:して)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      let body = m[1].trim();
+
+      let startDate = ymd(today), endDate = null;
+      const dateRange = extractDateRange(body);
+      if(dateRange){
+        startDate = dateRange.start;
+        endDate = dateRange.end;
+        body = dateRange.rest;
+      }
+
+      let time = null, endTime = null;
+      const timeRange = extractTimeRange(body);
+      if(timeRange){
+        time = timeRange.start;
+        endTime = timeRange.end;
+        body = timeRange.rest;
+      } else {
+        const single = extractSpokenTime(body);
+        if(single){
+          time = single.time;
+          body = single.rest;
+        }
+      }
+
+      const title = body.trim();
+      if(!title){
+        return '予定の内容が聞き取れませんでした。「予定追加、9時から18時、出張」のように話してください。';
+      }
+      const ev = addCalEvent(startDate, time, title, endDate, endTime);
+      updateCalBtnState();
+      if(!ev) return '予定の追加に失敗しました。';
+      let timeLabel = time ? (endTime ? `${time}から${endTime}` : time) : '';
+      let dateLabel = endDate ? `${startDate.slice(5).replace('-','/')}〜${endDate.slice(5).replace('-','/')}` : '';
+      return `${dateLabel ? dateLabel+'、' : ''}${timeLabel ? timeLabel+'に' : ''}「${ev.title}」を予定に追加しました。`;
+    }
+
+    let targetDate = null;
+    let label = '';
+    if(/明日.*予定/.test(s)){
+      const d = new Date(today); d.setDate(d.getDate()+1);
+      targetDate = ymd(d); label = '明日';
+    } else if(/今日.*予定|予定(を)?教えて|予定(は|一覧)/.test(s)){
+      targetDate = ymd(today); label = '今日';
+    }
+    if(targetDate){
+      const evs = eventsOn(targetDate);
+      updateCalBtnState();
+      if(evs.length === 0) return `${label}の予定はありません。`;
+      const list = evs.map(e => `${e.time ? e.time+'、' : ''}${e.title}`).join('、');
+      return `${label}の予定が${evs.length}件あります。${list}`;
+    }
+    return null;
+  }
+  // ============ end calendar ============
+
+
+
+  // ============ text input fallback (works on iPhone Safari, keeps user-gesture for speech) ============
+  const textInput = document.getElementById('text-input');
+  const textSend = document.getElementById('text-send');
+
+  let speechUnlocked = false;
+  function unlockSpeechIfNeeded(){
+    // iOS Safari requires speechSynthesis.speak() to be called from within
+    // a direct user-gesture handler at least once before it will play audio.
+    if(speechUnlocked || !('speechSynthesis' in window)) return;
+    try{
+      const silent = new SpeechSynthesisUtterance(' ');
+      silent.volume = 0;
+      window.speechSynthesis.speak(silent);
+      speechUnlocked = true;
+    }catch(e){}
+  }
+
+  async function sendTextInput(){
+    const val = textInput.value.trim();
+    if(!val) return;
+    unlockSpeechIfNeeded();
+    addLine('user', val);
+    textInput.value = '';
+    setState('thinking');
+    await handleVoiceInput(val);
+  }
+  textSend.addEventListener('click', sendTextInput);
+  textInput.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') sendTextInput();
+  });
+
+  // also unlock on the talk button / any first tap, in case mic IS supported
+  document.body.addEventListener('touchend', unlockSpeechIfNeeded, { once:true });
+  document.body.addEventListener('click', unlockSpeechIfNeeded, { once:true });
+  // ============ end text input fallback ============
+
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let srSupported = !!SR;
+  if(srSupported){
+    recognition = new SR();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setState('listening');
+    recognition.onerror = (e) => {
+      console.error('SR error', e.error);
+      setState('error');
+      setTimeout(()=>setState('idle'), 1600);
+    };
+    recognition.onend = () => {
+      if(listening) setState('idle');
+    };
+    recognition.onresult = async (e) => {
+      const said = e.results[0][0].transcript;
+      addLine('user', said);
+      setState('thinking');
+      await handleVoiceInput(said);
+    };
+  }
+
+  coreWrap.addEventListener('click', () => {
+    unlockSpeechIfNeeded();
+    if(!srSupported){
+      // iPhone Safari etc: no speech recognition available, fall back to text input
+      textInput.focus();
+      return;
+    }
+    if(listening){
+      recognition.stop();
+      setState('idle');
+      return;
+    }
+    // stop any speaking
+    window.speechSynthesis.cancel();
+    try{
+      recognition.start();
+    }catch(err){
+      // already started guard
+    }
+  });
+
+  voiceToggle.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    voiceToggle.classList.toggle('on', voiceOn);
+    voiceToggle.textContent = voiceOn ? '🔊 音声ON' : '🔇 音声OFF';
+    if(!voiceOn) window.speechSynthesis.cancel();
+  });
+
+  // ============ voice settings (auto: calm, lower-pitch male voice, no UI panel) ============
+  // Fixed tuning: slightly lower pitch and slightly slower pace for a calmer, deeper tone.
+  let voiceSettings = { voiceURI: null, rate: 0.94, pitch: 0.75 };
+
+  function pickPreferredVoice(){
+    if(!('speechSynthesis' in window)) return;
+    const voices = window.speechSynthesis.getVoices();
+    if(!voices.length) return;
+    const ja = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
+    // common male-labeled Japanese voice names across platforms
+    const maleNamePattern = /otoya|male|man|ichiro|hattori|takumi|daichi/i;
+    let chosen = ja.find(v => maleNamePattern.test(v.name));
+    if(!chosen) chosen = ja.find(v => !/female|kyoko|woman|sakura|haruka/i.test(v.name));
+    if(!chosen) chosen = ja[0];
+    if(chosen) voiceSettings.voiceURI = chosen.voiceURI;
+  }
+  if('speechSynthesis' in window){
+    pickPreferredVoice();
+    window.speechSynthesis.onvoiceschanged = pickPreferredVoice;
+  }
+  // ============ end voice settings ============
+
+  function speak(text){
+    if(!voiceOn || !('speechSynthesis' in window)){
+      setState('idle');
+      return;
+    }
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = voiceSettings.rate || 1.02;
+    utter.pitch = voiceSettings.pitch || 0.95;
+    if(voiceSettings.voiceURI){
+      const v = window.speechSynthesis.getVoices().find(v => v.voiceURI === voiceSettings.voiceURI);
+      if(v) utter.voice = v;
+    }
+    utter.onstart = () => setState('speaking');
+    utter.onend = () => setState('idle');
+    utter.onerror = () => setState('idle');
+    window.speechSynthesis.speak(utter);
+  }
+
+  function buildSystemPrompt(){
+    const now = new Date();
+    const days = ['日','月','火','水','木','金','土'];
+    const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日(${days[now.getDay()]}) ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+
+    let base = "あなたは「Ratio(ラティオ)」という、Iron Manに登場するJARVISのような、知的で気の利いた執事AIです。ユーザーに簡潔(2〜4文程度)、丁寧かつウィットに富んだ日本語で応答してください。音声で読み上げられるため、記号や箇条書き、Markdownは使わず、自然な話し言葉で答えてください。";
+    base += `\n\n現在の日時: ${dateStr}`;
+    return base;
+  }
+
+  async function respondTo(userText){
+    history.push({role:'user', content:userText});
+    try{
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          system: buildSystemPrompt(),
+          messages: history
+        })
+      });
+      const data = await response.json();
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      const reply = textBlock ? textBlock.text : 'すみません、応答の生成に失敗しました。';
+      history.push({role:'assistant', content:reply});
+      addLine('jarvis', reply);
+      speak(reply);
+    }catch(err){
+      console.error(err);
+      addLine('jarvis', '通信エラーが発生しました。もう一度お試しください。');
+      setState('error');
+      setTimeout(()=>setState('idle'), 1600);
+    }
+  }
+
+  // ============ morning briefing (5:00-9:00 only) ============
+  function buildMorningBriefing(){
+    const parts = [];
+
+    const todayEvs = eventsOn(ymd(today));
+    if(todayEvs.length > 0){
+      const list = todayEvs.map(e => {
+        let label = e.time ? (e.endTime ? `${e.time}から${e.endTime}` : e.time) : '終日';
+        return `${label}、${e.title}`;
+      }).join('、');
+      parts.push(`今日の予定は${todayEvs.length}件です。${list}。`);
+    } else {
+      parts.push('今日の予定は登録されていません。');
+    }
+
+    const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate()+1);
+    const dueSoon = tasks.filter(t => !t.done && t.date && t.date <= ymd(tomorrow));
+    if(dueSoon.length > 0){
+      const overdue = dueSoon.filter(t => t.date < ymd(today));
+      const list = dueSoon.map(t => t.text).join('、');
+      parts.push(`締め切りが近いタスクが${dueSoon.length}件あります。${list}。${overdue.length > 0 ? '中には期限を過ぎているものも含まれます。' : ''}`);
+    }
+
+    return parts.join(' ');
+  }
+
+  // greet on load
+  setTimeout(() => {
+    const hour = new Date().getHours();
+    let greet;
+    if(hour >= 5 && hour < 9){
+      greet = `おはようございます。${buildMorningBriefing()}`;
+    } else {
+      greet = 'システム起動完了です。今はタスクの登録と読み上げをお手伝いできます。「タスク追加、それから内容」と話しかけてください。';
+    }
+    addLine('jarvis', greet);
+    speak(greet);
+  }, 500);
+  // ============ end morning briefing ============
+
+  // register service worker for PWA / offline shell caching
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RATIO</title>
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#050810">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ratio">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png" type="image/png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+  :root{
+    --bg-0:#050810;
+    --bg-1:#0a1220;
+    --panel:#0d1b2e;
+    --line:#16324f;
+    --cyan:#4fd8ff;
+    --cyan-dim:#1c6b8a;
+    --amber:#ffb454;
+    --red:#ff5c5c;
+    --text:#d9ecf8;
+    --text-dim:#5c7c93;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:
+      radial-gradient(ellipse at 50% -10%, #0e2438 0%, var(--bg-0) 55%),
+      var(--bg-0);
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    overflow:hidden;
+  }
+  #app{
+    position:relative;
+    width:100%;height:100vh;min-height:560px;
+    display:flex;flex-direction:column;
+    align-items:center;
+    padding:22px 16px 16px;
+  }
+
+  /* scanline / grid atmosphere */
+  #app::before{
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(79,216,255,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,216,255,0.035) 1px, transparent 1px);
+    background-size:34px 34px;
+    mask-image: radial-gradient(ellipse at 50% 40%, black 0%, transparent 72%);
+    pointer-events:none;
+  }
+
+  header{
+    display:flex; align-items:baseline; gap:10px;
+    z-index:2;
+  }
+  header .logo{
+    font-family:'Orbitron', sans-serif;
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:6px;
+    color:var(--cyan);
+    text-shadow:0 0 12px rgba(79,216,255,.55);
+  }
+  header .sub{
+    font-size:9px;
+    letter-spacing:3px;
+    color:var(--text-dim);
+  }
+
+  #stage{
+    position:relative;
+    flex:1;
+    width:100%;
+    max-width:420px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:2;
+  }
+
+  #core-wrap{
+    position:relative;
+    width:min(78vw,260px);
+    height:min(78vw,260px);
+  }
+  svg#core{ width:100%; height:100%; overflow:visible; }
+
+  .ring{ fill:none; stroke:var(--cyan-dim); }
+  .ring-active{ stroke:var(--cyan); filter:drop-shadow(0 0 6px rgba(79,216,255,.8)); }
+  .tick{ stroke:var(--line); stroke-width:1; }
+
+  #core-inner{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column;
+  }
+  #amp-canvas{ position:absolute; inset:0; }
+
+  #core-label{
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:3px;
+    color:var(--cyan);
+    text-shadow:0 0 10px rgba(79,216,255,.6);
+    z-index:3;
+    text-align:center;
+    pointer-events:none;
+    transition:opacity .2s;
+  }
+  #core-sub{
+    font-size:9px;
+    color:var(--text-dim);
+    letter-spacing:2px;
+    margin-top:4px;
+    z-index:3;
+  }
+
+  #mic-btn{
+    position:absolute; bottom:0; left:50%; transform:translate(-50%,120%);
+  }
+
+  #transcript{
+    z-index:2;
+    width:100%;
+    max-width:460px;
+    min-height:120px;
+    max-height:34vh;
+    overflow-y:auto;
+    padding:0 4px 8px;
+    margin-top:6px;
+  }
+  #transcript::-webkit-scrollbar{ width:4px; }
+  #transcript::-webkit-scrollbar-thumb{ background:var(--cyan-dim); }
+
+  .line{
+    display:flex; gap:8px;
+    font-size:12.5px;
+    line-height:1.55;
+    margin:9px 0;
+    animation:rise .25s ease-out;
+  }
+  @keyframes rise{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+  .who{
+    flex:0 0 auto;
+    font-family:'Orbitron', sans-serif;
+    font-size:9px;
+    letter-spacing:1px;
+    padding-top:2px;
+    width:44px;
+  }
+  .line.user .who{ color:var(--amber); }
+  .line.jarvis .who{ color:var(--cyan); }
+  .line .txt{ color:var(--text); flex:1; word-break:break-word; }
+  .line.user .txt{ color:#c9d6de; }
+
+  #controls{
+    z-index:2;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    margin-top:8px;
+    padding-bottom:6px;
+  }
+
+  #talk{
+    position:relative;
+    width:64px;height:64px;
+    border-radius:50%;
+    border:1px solid var(--cyan-dim);
+    background:radial-gradient(circle at 50% 40%, #0f2740, #071320);
+    color:var(--cyan);
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:box-shadow .2s, border-color .2s, transform .15s;
+  }
+  #talk:hover{ transform:translateY(-1px); }
+  #talk:active{ transform:translateY(0); }
+  #talk.listening{
+    border-color:var(--cyan);
+    box-shadow:0 0 0 0 rgba(79,216,255,.5);
+    animation:pulse-ring 1.4s infinite;
+  }
+  @keyframes pulse-ring{
+    0%{ box-shadow:0 0 0 0 rgba(79,216,255,.45); }
+    70%{ box-shadow:0 0 0 16px rgba(79,216,255,0); }
+    100%{ box-shadow:0 0 0 0 rgba(79,216,255,0); }
+  }
+  #talk svg{ width:26px; height:26px; }
+
+  #status-text{
+    font-size:10px;
+    letter-spacing:2px;
+    color:var(--text-dim);
+    min-width:120px;
+  }
+  #status-text.err{ color:var(--red); }
+
+  #voice-toggle{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #voice-toggle.on{ color:var(--cyan); border-color:var(--cyan-dim); }
+
+  #ctx-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #ctx-btn.on{ color:var(--amber); border-color:#7a5a26; }
+
+  #ctx-pill{
+    z-index:2;
+    display:none;
+    align-items:center;
+    gap:6px;
+    max-width:340px;
+    padding:5px 12px;
+    border:1px solid #7a5a26;
+    border-radius:12px;
+    background:rgba(255,180,84,0.06);
+    color:var(--amber);
+    font-size:9.5px;
+    letter-spacing:.5px;
+    margin-top:8px;
+    text-align:center;
+  }
+  #ctx-pill.show{ display:flex; }
+  #ctx-pill .dot{
+    width:5px;height:5px;border-radius:50%;
+    background:var(--amber);
+    flex:0 0 auto;
+    box-shadow:0 0 5px rgba(255,180,84,.8);
+  }
+  #ctx-pill span.txt{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  #ctx-overlay{
+    position:fixed; inset:0;
+    background:rgba(2,6,12,0.72);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:10;
+  }
+  #ctx-overlay.open{ display:flex; }
+
+  #ctx-panel{
+    width:100%;
+    max-width:460px;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:18px 18px 0 0;
+    padding:18px 18px 22px;
+    box-shadow:0 -10px 30px rgba(0,0,0,.5);
+    animation:slideup .22s ease-out;
+  }
+  @keyframes slideup{ from{transform:translateY(100%);} to{transform:translateY(0);} }
+
+  #ctx-panel h3{
+    margin:0 0 10px;
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--amber);
+    font-weight:600;
+  }
+  #ctx-panel .desc{
+    font-size:10px;
+    color:var(--text-dim);
+    line-height:1.6;
+    margin-bottom:14px;
+  }
+  #ctx-chips{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin-bottom:14px;
+  }
+  .ctx-chip{
+    padding:6px 12px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:transparent;
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    cursor:pointer;
+  }
+  .ctx-chip.active{
+    color:var(--amber);
+    border-color:#7a5a26;
+    background:rgba(255,180,84,0.08);
+  }
+  #ctx-input{
+    width:100%;
+    min-height:64px;
+    resize:vertical;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    color:var(--text);
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:10px 12px;
+    margin-bottom:14px;
+  }
+  #ctx-input:focus{ outline:1px solid var(--cyan-dim); }
+  #ctx-actions{
+    display:flex; gap:10px; justify-content:flex-end;
+  }
+  #ctx-actions button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    padding:8px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:none;
+    color:var(--text-dim);
+  }
+  #ctx-save{
+    color:#051018 !important;
+    background:var(--amber) !important;
+    border-color:var(--amber) !important;
+  }
+
+  #hint{
+    font-size:9.5px;
+    color:var(--text-dim);
+    text-align:center;
+    max-width:300px;
+    margin-top:10px;
+    line-height:1.6;
+    z-index:2;
+  }
+  #hint b{ color:var(--amber); font-weight:500; }
+
+  @media (prefers-reduced-motion: reduce){
+    #talk.listening{ animation:none; }
+    .line{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">R A T I O</div>
+    <div class="sub">VOICE INTERFACE</div>
+  </header>
+
+  <div id="stage">
+    <div id="core-wrap">
+      <svg id="core" viewBox="0 0 260 260">
+        <circle class="ring" id="ringOuter" cx="130" cy="130" r="118" stroke-width="1"/>
+        <circle class="ring" id="ringMid" cx="130" cy="130" r="96" stroke-width="1" stroke-dasharray="2 6"/>
+        <circle class="ring ring-active" id="ringInner" cx="130" cy="130" r="72" stroke-width="1.5"/>
+        <g id="ticks"></g>
+      </svg>
+      <canvas id="amp-canvas" width="260" height="260"></canvas>
+      <div id="core-inner">
+        <div id="core-label">STANDBY</div>
+        <div id="core-sub">tap to speak</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="transcript"></div>
+
+  <div id="ctx-pill"><div class="dot"></div><span class="txt" id="ctx-pill-text"></span></div>
+
+  <div id="controls">
+    <button id="voice-toggle" class="on" title="音声読み上げ">🔊 音声ON</button>
+    <button id="talk" title="話しかける">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+        <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/>
+        <path d="M19 11a7 7 0 0 1-14 0"/>
+        <path d="M12 18v3"/>
+      </svg>
+    </button>
+    <button id="ctx-btn" title="状況を共有">📍 状況</button>
+  </div>
+  <div id="status-text" style="margin-top:2px;">オフライン</div>
+
+  <div id="hint">マイクのボタンを押して話しかけてください。話しかけなくても、<b>「状況」</b>を共有しておくとRatioがそれを踏まえて応答します。</div>
+</div>
+
+<div id="ctx-overlay">
+  <div id="ctx-panel">
+    <h3>状況を共有</h3>
+    <div class="desc">コマンドを言わなくても、今の状況をRatioに伝えておくと、それを踏まえた応答をします。</div>
+    <div id="ctx-chips">
+      <button class="ctx-chip" data-v="在宅で作業中">在宅で作業中</button>
+      <button class="ctx-chip" data-v="外出中・移動中">外出中・移動中</button>
+      <button class="ctx-chip" data-v="会議・打ち合わせ中">会議・打ち合わせ中</button>
+      <button class="ctx-chip" data-v="運転中">運転中</button>
+      <button class="ctx-chip" data-v="集中作業中・邪魔しないでほしい">集中したい</button>
+      <button class="ctx-chip" data-v="就寝前・リラックスしたい">就寝前</button>
+    </div>
+    <textarea id="ctx-input" placeholder="自由に状況を書いてもOK(例: 明日プレゼンで緊張している、子どもが隣で寝ている、等)"></textarea>
+    <div id="ctx-actions">
+      <button id="ctx-clear">クリア</button>
+      <button id="ctx-close">閉じる</button>
+      <button id="ctx-save">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const talkBtn = document.getElementById('talk');
+  const statusText = document.getElementById('status-text');
+  const coreLabel = document.getElementById('core-label');
+  const coreSub = document.getElementById('core-sub');
+  const transcript = document.getElementById('transcript');
+  const voiceToggle = document.getElementById('voice-toggle');
+  const ringInner = document.getElementById('ringInner');
+  const ticksGroup = document.getElementById('ticks');
+  const canvas = document.getElementById('amp-canvas');
+  const ctx = canvas.getContext('2d');
+
+  let voiceOn = true;
+  let listening = false;
+  let speaking = false;
+  let history = [];
+  let activeChips = new Set();
+  let freeContext = '';
+
+  // --- context sharing panel ---
+  const ctxBtn = document.getElementById('ctx-btn');
+  const ctxOverlay = document.getElementById('ctx-overlay');
+  const ctxChips = document.querySelectorAll('.ctx-chip');
+  const ctxInput = document.getElementById('ctx-input');
+  const ctxSave = document.getElementById('ctx-save');
+  const ctxClear = document.getElementById('ctx-clear');
+  const ctxCloseBtn = document.getElementById('ctx-close');
+  const ctxPill = document.getElementById('ctx-pill');
+  const ctxPillText = document.getElementById('ctx-pill-text');
+
+  function currentContextSummary(){
+    const parts = [...activeChips];
+    if(freeContext.trim()) parts.push(freeContext.trim());
+    return parts.join(' / ');
+  }
+
+  function updateCtxUI(){
+    const summary = currentContextSummary();
+    ctxBtn.classList.toggle('on', summary.length > 0);
+    if(summary){
+      ctxPill.classList.add('show');
+      ctxPillText.textContent = summary;
+    }else{
+      ctxPill.classList.remove('show');
+    }
+  }
+
+  ctxBtn.addEventListener('click', () => {
+    ctxOverlay.classList.add('open');
+  });
+  ctxCloseBtn.addEventListener('click', () => ctxOverlay.classList.remove('open'));
+  ctxOverlay.addEventListener('click', (e) => { if(e.target === ctxOverlay) ctxOverlay.classList.remove('open'); });
+
+  ctxChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const v = chip.dataset.v;
+      if(activeChips.has(v)){ activeChips.delete(v); chip.classList.remove('active'); }
+      else{ activeChips.add(v); chip.classList.add('active'); }
+    });
+  });
+
+  ctxSave.addEventListener('click', () => {
+    freeContext = ctxInput.value;
+    updateCtxUI();
+    ctxOverlay.classList.remove('open');
+    const summary = currentContextSummary();
+    if(summary) addLine('jarvis', `了解しました。状況を共有いただきありがとうございます: 「${summary}」`);
+  });
+
+  ctxClear.addEventListener('click', () => {
+    activeChips.clear();
+    ctxChips.forEach(c => c.classList.remove('active'));
+    freeContext = '';
+    ctxInput.value = '';
+    updateCtxUI();
+  });
+
+  // build tick marks around outer ring
+  const N = 60;
+  for(let i=0;i<N;i++){
+    const a = (i/N) * Math.PI*2;
+    const r1 = 106, r2 = 112;
+    const x1 = 130 + r1*Math.cos(a), y1 = 130 + r1*Math.sin(a);
+    const x2 = 130 + r2*Math.cos(a), y2 = 130 + r2*Math.sin(a);
+    const line = document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',x1); line.setAttribute('y1',y1);
+    line.setAttribute('x2',x2); line.setAttribute('y2',y2);
+    line.setAttribute('class','tick');
+    ticksGroup.appendChild(line);
+  }
+
+  // slow rotation of outer ring
+  let rot = 0;
+  function animateRing(){
+    rot += 0.15;
+    document.getElementById('ringOuter').style.transformOrigin='130px 130px';
+    document.getElementById('ringOuter').style.transform = `rotate(${rot}deg)`;
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // amplitude visual (simulated pulse driven by listening/speaking state)
+  let amp = 0, target = 0, t = 0;
+  function drawAmp(){
+    t += 0.06;
+    amp += (target - amp) * 0.12;
+    ctx.clearRect(0,0,260,260);
+    const bars = 48;
+    for(let i=0;i<bars;i++){
+      const a = (i/bars) * Math.PI*2;
+      const wig = (listening||speaking) ? (Math.sin(t*3 + i*0.5) * 0.5 + 0.5) : 0.15;
+      const len = 6 + amp * 22 * wig + (listening||speaking ? 4 : 0);
+      const r1 = 82;
+      const r2 = r1 + len;
+      const x1 = 130 + r1*Math.cos(a), y1 = 130 + r1*Math.sin(a);
+      const x2 = 130 + r2*Math.cos(a), y2 = 130 + r2*Math.sin(a);
+      ctx.strokeStyle = (listening||speaking) ? 'rgba(79,216,255,'+(0.35+wig*0.5)+')' : 'rgba(79,216,255,0.15)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+      ctx.stroke();
+    }
+    requestAnimationFrame(drawAmp);
+  }
+  drawAmp();
+
+  function setState(mode){
+    // mode: idle | listening | thinking | speaking | error
+    listening = mode === 'listening';
+    speaking = mode === 'speaking';
+    target = (mode==='listening') ? 1 : (mode==='speaking' ? 0.8 : (mode==='thinking' ? 0.4 : 0));
+    talkBtn.classList.toggle('listening', mode==='listening');
+    statusText.classList.toggle('err', mode==='error');
+    const map = {
+      idle:['STANDBY','tap to speak','オフライン'],
+      listening:['LISTENING','聞いています…','音声認識中'],
+      thinking:['PROCESSING','解析中…','応答を生成中'],
+      speaking:['RESPONDING','応答中…','RATIOが応答中'],
+      error:['ERROR','エラーが発生','エラー']
+    };
+    const [l,s,st] = map[mode] || map.idle;
+    coreLabel.textContent = l;
+    coreSub.textContent = s;
+    statusText.textContent = st;
+  }
+  setState('idle');
+
+  function addLine(who, text){
+    const div = document.createElement('div');
+    div.className = 'line ' + (who==='user' ? 'user' : 'jarvis');
+    div.innerHTML = `<div class="who">${who==='user' ? 'YOU' : 'RATIO'}</div><div class="txt"></div>`;
+    div.querySelector('.txt').textContent = text;
+    transcript.appendChild(div);
+    transcript.scrollTop = transcript.scrollHeight;
+  }
+
+  // --- Speech recognition setup ---
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognition = null;
+  let srSupported = !!SR;
+  if(srSupported){
+    recognition = new SR();
+    recognition.lang = 'ja-JP';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setState('listening');
+    recognition.onerror = (e) => {
+      console.error('SR error', e.error);
+      setState('error');
+      setTimeout(()=>setState('idle'), 1600);
+    };
+    recognition.onend = () => {
+      if(listening) setState('idle');
+    };
+    recognition.onresult = async (e) => {
+      const said = e.results[0][0].transcript;
+      addLine('user', said);
+      setState('thinking');
+      await respondTo(said);
+    };
+  }
+
+  talkBtn.addEventListener('click', () => {
+    if(!srSupported){
+      alert('このブラウザは音声認識(Web Speech API)に対応していません。Google Chromeでお試しください。テキストでの入力は下のヒントをご覧ください。');
+      return;
+    }
+    if(listening){
+      recognition.stop();
+      setState('idle');
+      return;
+    }
+    // stop any speaking
+    window.speechSynthesis.cancel();
+    try{
+      recognition.start();
+    }catch(err){
+      // already started guard
+    }
+  });
+
+  voiceToggle.addEventListener('click', () => {
+    voiceOn = !voiceOn;
+    voiceToggle.classList.toggle('on', voiceOn);
+    voiceToggle.textContent = voiceOn ? '🔊 音声ON' : '🔇 音声OFF';
+    if(!voiceOn) window.speechSynthesis.cancel();
+  });
+
+  function speak(text){
+    if(!voiceOn || !('speechSynthesis' in window)){
+      setState('idle');
+      return;
+    }
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = 'ja-JP';
+    utter.rate = 1.02;
+    utter.pitch = 0.95;
+    utter.onstart = () => setState('speaking');
+    utter.onend = () => setState('idle');
+    utter.onerror = () => setState('idle');
+    window.speechSynthesis.speak(utter);
+  }
+
+  function buildSystemPrompt(){
+    const now = new Date();
+    const days = ['日','月','火','水','木','金','土'];
+    const dateStr = `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日(${days[now.getDay()]}) ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    const ctx = currentContextSummary();
+
+    let base = "あなたは「Ratio(ラティオ)」という、Iron Manに登場するJARVISのような、知的で気の利いた執事AIです。ユーザーに簡潔(2〜4文程度)、丁寧かつウィットに富んだ日本語で応答してください。音声で読み上げられるため、記号や箇条書き、Markdownは使わず、自然な話し言葉で答えてください。";
+    base += `\n\n現在の日時: ${dateStr}`;
+    if(ctx){
+      base += `\nユーザーが共有している現在の状況: 「${ctx}」`;
+      base += "\nユーザーは明示的なコマンドを言わなくても、この状況を踏まえて先回りした気配りのある応答をしてください。例えば運転中や会議中なら簡潔に、集中したい状況なら要件のみ手短に、就寝前なら落ち着いたトーンで話してください。";
+    }
+    return base;
+  }
+
+  async function respondTo(userText){
+    history.push({role:'user', content:userText});
+    try{
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          system: buildSystemPrompt(),
+          messages: history
+        })
+      });
+      const data = await response.json();
+      const textBlock = (data.content || []).find(b => b.type === 'text');
+      const reply = textBlock ? textBlock.text : 'すみません、応答の生成に失敗しました。';
+      history.push({role:'assistant', content:reply});
+      addLine('jarvis', reply);
+      speak(reply);
+    }catch(err){
+      console.error(err);
+      addLine('jarvis', '通信エラーが発生しました。もう一度お試しください。');
+      setState('error');
+      setTimeout(()=>setState('idle'), 1600);
+    }
+  }
+
+  // greet on load
+  setTimeout(() => {
+    const greet = 'システム起動完了です。ご用件をどうぞ。';
+    addLine('jarvis', greet);
+    speak(greet);
+  }, 500);
+
+  // register service worker for PWA / offline shell caching
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>

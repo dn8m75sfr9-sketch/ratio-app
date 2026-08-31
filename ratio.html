@@ -2219,9 +2219,12 @@
     const voices = window.speechSynthesis.getVoices();
     if(!voices.length) return;
     const ja = voices.filter(v => v.lang && v.lang.toLowerCase().startsWith('ja'));
-    // common male-labeled Japanese voice names across platforms
-    const maleNamePattern = /otoya|male|man|ichiro|hattori|takumi|daichi/i;
-    let chosen = ja.find(v => maleNamePattern.test(v.name));
+    // prefer Otoya specifically, then fall back to any other male-labeled Japanese voice
+    let chosen = ja.find(v => /otoya/i.test(v.name));
+    if(!chosen){
+      const maleNamePattern = /male|man|ichiro|hattori|takumi|daichi/i;
+      chosen = ja.find(v => maleNamePattern.test(v.name));
+    }
     if(!chosen) chosen = ja.find(v => !/female|kyoko|woman|sakura|haruka/i.test(v.name));
     if(!chosen) chosen = ja[0];
     if(chosen) voiceSettings.voiceURI = chosen.voiceURI;
@@ -2229,6 +2232,11 @@
   if('speechSynthesis' in window){
     pickPreferredVoice();
     window.speechSynthesis.onvoiceschanged = pickPreferredVoice;
+    // iOS Safari sometimes populates the voice list late, and doesn't always
+    // fire onvoiceschanged reliably. Retry a few times to be safe.
+    [300, 800, 1500, 3000].forEach(delay => {
+      setTimeout(pickPreferredVoice, delay);
+    });
   }
   // ============ end voice settings ============
 
@@ -2318,7 +2326,7 @@
     return parts.join(' ');
   }
 
-  // greet on load
+  // greet on load (delayed a bit longer so the preferred voice has time to load on iOS)
   setTimeout(() => {
     const hour = new Date().getHours();
     let greet;
@@ -2335,7 +2343,7 @@
     }
     addLine('jarvis', greet);
     speak(greet);
-  }, 500);
+  }, 900);
   // ============ end morning briefing ============
 
   // register service worker for PWA / offline shell caching

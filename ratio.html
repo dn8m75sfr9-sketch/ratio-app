@@ -909,6 +909,263 @@
     cursor:pointer;
   }
 
+  /* ============ Nova Care (health sub-screen) ============ */
+  #nova-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:1px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #nova-btn.on{ color:#4ade9a; border-color:#1f6b47; }
+
+  /* Shared full-screen layout for all Nova sub-apps (Care/Wallet/Habit/Fit/Read),
+     each themed with its own accent color via a data-accent wrapper. */
+  .nova-fullscreen{
+    position:fixed; inset:0;
+    z-index:60;
+    display:none;
+    flex-direction:column;
+    padding:22px 16px 24px;
+    overflow-y:auto;
+  }
+  .nova-fullscreen.show{ display:flex; }
+  .nova-fullscreen.theme-green{ background: radial-gradient(ellipse at 50% -10%, #0e3826 0%, #04120c 55%), #03100b; }
+  .nova-fullscreen.theme-amber{ background: radial-gradient(ellipse at 50% -10%, #3a2a0e 0%, #120d04 55%), #100b03; }
+  .nova-fullscreen.theme-purple{ background: radial-gradient(ellipse at 50% -10%, #2a1a3a 0%, #0d0412 55%), #0b0310; }
+  .nova-fullscreen.theme-blue{ background: radial-gradient(ellipse at 50% -10%, #0e2a3a 0%, #040d12 55%), #030b10; }
+  .nova-fullscreen.theme-rose{ background: radial-gradient(ellipse at 50% -10%, #3a0e22 0%, #12040a 55%), #100308; }
+
+  .theme-amber .nova-logo, .theme-amber .nova-card h4, .theme-amber #nova-back{ color:#ffb454 !important; }
+  .theme-amber #nova-back{ border-color:#7a5a26 !important; }
+  .theme-amber .nova-card{ border-color:#3a2a0e !important; background:#160f05 !important; }
+  .theme-amber .nova-btn-primary{ background:#3a2a0e !important; border-color:#ffb454 !important; color:#ffb454 !important; }
+  .theme-amber .nova-row input, .theme-amber .nova-row select{ background:#231908 !important; border-color:#7a5a26 !important; }
+  .theme-amber .nova-stat-line b{ color:#ffb454 !important; }
+  .theme-amber .nova-list-item{ border-color:#3a2a0e !important; }
+  .theme-amber .nl-del, .theme-amber .nova-empty{ color:#a68a5c !important; }
+
+  .theme-purple .nova-logo, .theme-purple .nova-card h4, .theme-purple #nova-back{ color:#c9a6ff !important; }
+  .theme-purple #nova-back{ border-color:#5a3a8a !important; }
+  .theme-purple .nova-card{ border-color:#2a1a3a !important; background:#130a1a !important; }
+  .theme-purple .nova-btn-primary{ background:#2a1a3a !important; border-color:#c9a6ff !important; color:#c9a6ff !important; }
+  .theme-purple .nova-row input, .theme-purple .nova-row select{ background:#1c1128 !important; border-color:#5a3a8a !important; }
+  .theme-purple .nova-stat-line b{ color:#c9a6ff !important; }
+  .theme-purple .nova-list-item{ border-color:#2a1a3a !important; }
+  .theme-purple .nl-del, .theme-purple .nova-empty{ color:#9a80c2 !important; }
+
+  .theme-blue .nova-logo, .theme-blue .nova-card h4, .theme-blue #nova-back{ color:#7fd4ff !important; }
+  .theme-blue #nova-back{ border-color:#1c6b8a !important; }
+  .theme-blue .nova-card{ border-color:#0e2a3a !important; background:#071a24 !important; }
+  .theme-blue .nova-btn-primary{ background:#0e2a3a !important; border-color:#7fd4ff !important; color:#7fd4ff !important; }
+  .theme-blue .nova-row input, .theme-blue .nova-row select{ background:#0a1e28 !important; border-color:#1c6b8a !important; }
+  .theme-blue .nova-stat-line b{ color:#7fd4ff !important; }
+  .theme-blue .nova-list-item{ border-color:#0e2a3a !important; }
+  .theme-blue .nl-del, .theme-blue .nova-empty{ color:#6ba3bd !important; }
+
+  .theme-rose .nova-logo, .theme-rose .nova-card h4, .theme-rose #nova-back{ color:#ff9ab8 !important; }
+  .theme-rose #nova-back{ border-color:#7a2b4a !important; }
+  .theme-rose .nova-card{ border-color:#3a0e22 !important; background:#16050d !important; }
+  .theme-rose .nova-btn-primary{ background:#3a0e22 !important; border-color:#ff9ab8 !important; color:#ff9ab8 !important; }
+  .theme-rose .nova-row input, .theme-rose .nova-row select{ background:#230a15 !important; border-color:#7a2b4a !important; }
+  .theme-rose .nova-stat-line b{ color:#ff9ab8 !important; }
+  .theme-rose .nova-list-item{ border-color:#3a0e22 !important; }
+  .theme-rose .nl-del, .theme-rose .nova-empty{ color:#c27b96 !important; }
+
+  #nova-head{
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:16px;
+  }
+  #nova-back{
+    background:none;
+    border:1px solid #1f6b47;
+    color:#4ade9a;
+    border-radius:10px;
+    padding:6px 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    cursor:pointer;
+  }
+  #nova-head .nova-logo{
+    font-family:'Orbitron', sans-serif;
+    font-weight:800;
+    font-size:14px;
+    letter-spacing:3px;
+    color:#4ade9a;
+    text-shadow:0 0 10px rgba(74,222,154,.5);
+  }
+  #nova-head .nova-sub{
+    font-size:8.5px;
+    letter-spacing:2px;
+    color:#6f9481;
+  }
+  .nova-card{
+    background:#07160f;
+    border:1px solid #12331f;
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .nova-card h4{
+    margin:0 0 10px;
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:#4ade9a;
+    font-weight:600;
+  }
+  .nova-row{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .nova-row input, .nova-row select{
+    flex:1 1 auto;
+    background:#0c2317;
+    border:1px solid #1f6b47;
+    border-radius:9px;
+    color:#e8f5ee;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    padding:9px 10px;
+  }
+  .nova-btn-primary{
+    flex:0 0 auto;
+    background:#123d27;
+    border:1px solid #4ade9a;
+    color:#4ade9a;
+    border-radius:9px;
+    padding:0 16px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    cursor:pointer;
+  }
+  .nova-stat-line{
+    font-size:12px;
+    color:#cfe8db;
+    margin-bottom:4px;
+  }
+  .nova-stat-line b{ color:#4ade9a; }
+  .nova-list{ max-height:180px; overflow-y:auto; }
+  .nova-list-item{
+    display:flex; align-items:center; gap:8px;
+    padding:7px 2px;
+    border-bottom:1px solid #12331f;
+    font-size:12px;
+    color:#dcece3;
+  }
+  .nova-list-item .nl-date{ color:#6f9481; font-size:10.5px; flex:0 0 auto; }
+  .nova-list-item .nl-main{ flex:1; }
+  .nova-list-item .nl-del{ background:none; border:none; color:#6f9481; font-size:13px; cursor:pointer; }
+  .nova-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .nova-chip{
+    padding:6px 10px;
+    border:1px solid #1f6b47;
+    border-radius:12px;
+    background:#0c2317;
+    color:#a6d9bf;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    cursor:pointer;
+  }
+  .nova-empty{ color:#6f9481; font-size:11px; text-align:center; padding:10px 0; }
+  .nova-note{ font-size:9.5px; color:#6f9481; line-height:1.6; margin-top:6px; }
+  .nova-review-box{
+    width:100%;
+    min-height:50px;
+    resize:vertical;
+    background:#0c2317;
+    border:1px solid #1f6b47;
+    border-radius:8px;
+    color:#e8f5ee;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    padding:8px 10px;
+    margin-top:6px;
+  }
+  #nova-weight-graph-container svg{ width:100%; height:auto; display:block; }
+  .nova-weight-empty{ color:#6f9481; font-size:11px; text-align:center; padding:20px 0; }
+
+  /* ============ end Nova Care ============ */
+
+  /* ============ settings screen ============ */
+  #settings-btn{
+    position:fixed;
+    top:16px; left:16px;
+    z-index:5;
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    font-size:14px;
+    padding:6px 10px;
+    border-radius:14px;
+    cursor:pointer;
+  }
+  #settings-overlay{
+    position:fixed; inset:0;
+    background:rgba(2,6,12,0.72);
+    backdrop-filter:blur(2px);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:12;
+  }
+  #settings-overlay.open{ display:flex; }
+  #settings-panel{
+    width:100%;
+    max-width:460px;
+    background:var(--bg-1);
+    border:1px solid var(--line);
+    border-bottom:none;
+    border-radius:18px 18px 0 0;
+    padding:18px 18px 20px;
+    box-shadow:0 -10px 30px rgba(0,0,0,.5);
+    animation:slideup .22s ease-out;
+  }
+  #settings-panel h3{
+    margin:0 0 12px;
+    font-family:'Orbitron', sans-serif;
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--text);
+    font-weight:600;
+  }
+  .settings-back-row{ margin-bottom:8px; }
+  .settings-back-btn{
+    background:none;
+    border:1px solid var(--line);
+    color:var(--text-dim);
+    border-radius:10px;
+    padding:6px 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    cursor:pointer;
+  }
+  .settings-item{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 4px;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+    font-size:13px;
+    color:var(--text);
+  }
+  .settings-item .si-icon{ font-size:16px; }
+  .settings-item .si-arrow{ margin-left:auto; color:var(--text-dim); }
+  #settings-close{
+    margin-top:14px;
+    width:100%;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:1px;
+    padding:9px 0;
+    border-radius:10px;
+    cursor:pointer;
+    border:1px solid var(--line);
+    background:none;
+    color:var(--text-dim);
+  }
+  /* ============ end settings screen ============ */
+
   #hint{
     font-size:9.5px;
     color:var(--text-dim);
@@ -937,6 +1194,8 @@
   </div>
 </div>
 
+<button id="settings-btn" title="設定">⚙️</button>
+
 <div id="app">
   <header>
     <div class="logo">R A T I O</div>
@@ -961,14 +1220,7 @@
 
   <div id="transcript"></div>
 
-  <div id="controls">
-    <button id="voice-toggle" class="on" title="音声読み上げ">🔊 音声ON</button>
-    <button id="task-btn" title="タスク">📋 タスク</button>
-    <button id="cal-btn" title="予定">📅 予定</button>
-    <button id="memo-btn" title="メモ">📝 メモ</button>
-    <button id="reminder-btn" title="リマインダー">🔁 リマインダー</button>
-  </div>
-  <div id="status-text" style="margin-top:2px;">オフライン</div>
+  <div id="status-text" style="margin-top:10px;">オフライン</div>
 
   <div id="text-row">
     <input id="text-input" type="text" placeholder="話す代わりにここに入力(例: タスク追加、資料を作る)">
@@ -1065,6 +1317,289 @@
   </div>
 </div>
 
+<div id="settings-overlay">
+  <div id="settings-panel">
+    <div id="settings-main-view">
+      <h3>設定</h3>
+      <div class="settings-item" id="settings-cat-usability">
+        <span>Usability</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-cat-controlcenter">
+        <span>Control Center</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-cat-capability">
+        <span>Capability</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <button id="settings-close">閉じる</button>
+    </div>
+
+    <div id="settings-usability-view" style="display:none;">
+      <div class="settings-back-row"><button class="settings-back-btn" data-back>‹ 設定</button></div>
+      <h3>Usability</h3>
+      <div class="settings-item" id="settings-nova-item">
+        <span>Nova Care(ヘルスケア)</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-wallet-item">
+        <span>Nova Wallet(家計簿)</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-habit-item">
+        <span>Nova Habit(習慣管理)</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-fit-item">
+        <span>Nova Fit(トレーニング記録)</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-read-item">
+        <span>Nova Read(読書記録)</span>
+        <span class="si-arrow">›</span>
+      </div>
+    </div>
+
+    <div id="settings-controlcenter-view" style="display:none;">
+      <div class="settings-back-row"><button class="settings-back-btn" data-back>‹ 設定</button></div>
+      <h3>Control Center</h3>
+      <div class="settings-item" id="settings-voice-item">
+        <span>音声読み上げ</span>
+        <span class="si-arrow" id="settings-voice-state">ON</span>
+      </div>
+    </div>
+
+    <div id="settings-capability-view" style="display:none;">
+      <div class="settings-back-row"><button class="settings-back-btn" data-back>‹ 設定</button></div>
+      <h3>Capability</h3>
+      <div class="settings-item" id="settings-task-item">
+        <span>タスク</span>
+        <span class="si-arrow" id="settings-task-badge">›</span>
+      </div>
+      <div class="settings-item" id="settings-cal-item">
+        <span>予定</span>
+        <span class="si-arrow" id="settings-cal-badge">›</span>
+      </div>
+      <div class="settings-item" id="settings-memo-item">
+        <span>メモ</span>
+        <span class="si-arrow">›</span>
+      </div>
+      <div class="settings-item" id="settings-reminder-item">
+        <span>リマインダー</span>
+        <span class="si-arrow" id="settings-reminder-badge">›</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="nova-screen" class="nova-fullscreen theme-green">
+  <div id="nova-head">
+    <button id="nova-back">‹ 設定</button>
+    <div>
+      <div class="nova-logo">NOVA CARE</div>
+      <div class="nova-sub">HEALTH MODULE</div>
+    </div>
+  </div>
+
+  <div class="nova-card">
+    <h4>体重記録</h4>
+    <div class="nova-row">
+      <input id="nova-weight-date" type="date">
+      <input id="nova-weight-input" type="number" step="0.1" placeholder="体重(kg)">
+      <button class="nova-btn-primary" id="nova-weight-add">記録</button>
+    </div>
+    <div class="nova-stat-line" id="nova-weight-stats"></div>
+    <button class="nova-btn-primary" id="nova-weight-graph-open" style="width:100%;margin-top:6px;">📈 体重の推移を見る</button>
+  </div>
+
+  <div class="nova-card">
+    <h4>今日の食事・摂取カロリー</h4>
+    <div class="nova-row">
+      <input id="nova-meal-name" type="text" placeholder="食品名を入力(自動でカロリーを概算します)">
+      <button class="nova-btn-primary" id="nova-meal-add">追加</button>
+    </div>
+    <div class="nova-stat-line" id="nova-meal-stats"></div>
+    <div class="nova-list" id="nova-meal-list"></div>
+    <div class="nova-note">カロリーはあくまで目安の概算値です。正確な栄養管理が必要な場合は、パッケージの表示や専門家にご確認ください。</div>
+  </div>
+
+  <div class="nova-card">
+    <h4>目標体重・目安カロリー</h4>
+    <div class="nova-row">
+      <select id="nova-gender">
+        <option value="male">男性</option>
+        <option value="female">女性</option>
+      </select>
+      <input id="nova-age" type="number" placeholder="年齢">
+      <input id="nova-height" type="number" placeholder="身長(cm)">
+    </div>
+    <div class="nova-row">
+      <select id="nova-activity">
+        <option value="1.2">activity: ほぼ運動しない</option>
+        <option value="1.375" selected>activity: 軽い運動(週1-3)</option>
+        <option value="1.55">activity: 中程度の運動(週3-5)</option>
+        <option value="1.725">activity: 激しい運動(週6-7)</option>
+      </select>
+    </div>
+    <div class="nova-row">
+      <input id="nova-target-weight" type="number" step="0.1" placeholder="目標体重(kg)">
+      <button class="nova-btn-primary" id="nova-goal-calc">計算する</button>
+    </div>
+    <div class="nova-stat-line" id="nova-goal-result"></div>
+    <div class="nova-note">Mifflin-St Jeor式による一般的な目安です。極端なカロリー制限は避け、体調に不安がある場合は医師や管理栄養士にご相談ください。</div>
+  </div>
+</div>
+
+<div id="nova-weight-graph-screen" class="nova-fullscreen theme-green">
+  <div id="nova-head">
+    <button id="nova-weight-graph-back">‹ Nova Care</button>
+    <div>
+      <div class="nova-logo">WEIGHT</div>
+      <div class="nova-sub">体重の推移</div>
+    </div>
+  </div>
+
+  <div class="nova-card">
+    <div id="nova-weight-graph-container"></div>
+  </div>
+
+  <div class="nova-card">
+    <h4>記録一覧</h4>
+    <div class="nova-list" id="nova-weight-list"></div>
+  </div>
+</div>
+
+<div id="nova-wallet-screen" class="nova-fullscreen theme-amber">
+  <div id="nova-head">
+    <button id="nova-wallet-back">‹ 設定</button>
+    <div>
+      <div class="nova-logo">NOVA WALLET</div>
+      <div class="nova-sub">家計簿</div>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>支出を記録</h4>
+    <div class="nova-row">
+      <input id="wallet-date" type="date">
+      <select id="wallet-category">
+        <option value="食費">食費</option>
+        <option value="交通費">交通費</option>
+        <option value="娯楽">娯楽</option>
+        <option value="日用品">日用品</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+    <div class="nova-row">
+      <input id="wallet-amount" type="number" placeholder="金額(円)">
+      <input id="wallet-memo" type="text" placeholder="メモ(任意)">
+      <button class="nova-btn-primary" id="wallet-add">記録</button>
+    </div>
+    <div class="nova-stat-line" id="wallet-stats"></div>
+    <button class="nova-btn-primary" id="wallet-monthly-open" style="width:100%;margin-top:6px;">📊 今月の記録を見る</button>
+  </div>
+</div>
+
+<div id="nova-wallet-monthly-screen" class="nova-fullscreen theme-amber">
+  <div id="nova-head">
+    <button id="nova-wallet-monthly-back">‹ Nova Wallet</button>
+    <div>
+      <div class="nova-logo">今月の記録</div>
+      <div class="nova-sub">カテゴリ別集計</div>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>カテゴリ別支出</h4>
+    <div id="wallet-chart-container"></div>
+  </div>
+  <div class="nova-card">
+    <h4>今月の記録一覧</h4>
+    <div class="nova-list" id="wallet-list"></div>
+  </div>
+</div>
+
+<div id="nova-habit-screen" class="nova-fullscreen theme-purple">
+  <div id="nova-head">
+    <button id="nova-habit-back">‹ 設定</button>
+    <div>
+      <div class="nova-logo">NOVA HABIT</div>
+      <div class="nova-sub">習慣管理</div>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>習慣を追加</h4>
+    <div class="nova-row">
+      <input id="habit-name" type="text" placeholder="習慣の名前(例: 筋トレ)">
+      <button class="nova-btn-primary" id="habit-add">追加</button>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>チェックする日付</h4>
+    <div class="nova-row">
+      <input id="habit-check-date" type="date">
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4 id="habit-list-title">今日のチェック</h4>
+    <div class="nova-list" id="habit-list"></div>
+  </div>
+</div>
+
+<div id="nova-fit-screen" class="nova-fullscreen theme-blue">
+  <div id="nova-head">
+    <button id="nova-fit-back">‹ 設定</button>
+    <div>
+      <div class="nova-logo">NOVA FIT</div>
+      <div class="nova-sub">トレーニング記録</div>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>トレーニングを記録</h4>
+    <div class="nova-row">
+      <input id="fit-date" type="date">
+      <input id="fit-exercise" type="text" placeholder="種目(例: ベンチプレス)">
+    </div>
+    <div class="nova-row">
+      <input id="fit-detail" type="text" placeholder="内容(例: 60kg×10回×3セット)">
+      <button class="nova-btn-primary" id="fit-add">記録</button>
+    </div>
+    <div class="nova-stat-line" id="fit-stats"></div>
+  </div>
+  <div class="nova-card">
+    <h4 id="fit-list-title">今日の記録</h4>
+    <div class="nova-list" id="fit-list"></div>
+  </div>
+</div>
+
+<div id="nova-read-screen" class="nova-fullscreen theme-rose">
+  <div id="nova-head">
+    <button id="nova-read-back">‹ 設定</button>
+    <div>
+      <div class="nova-logo">NOVA READ</div>
+      <div class="nova-sub">読書記録</div>
+    </div>
+  </div>
+  <div class="nova-card">
+    <h4>本を追加</h4>
+    <div class="nova-row">
+      <input id="read-date" type="date">
+      <input id="read-title" type="text" placeholder="本のタイトル">
+    </div>
+    <div class="nova-row">
+      <select id="read-status">
+        <option value="reading">読書中</option>
+        <option value="done">読了</option>
+      </select>
+      <button class="nova-btn-primary" id="read-add">追加</button>
+    </div>
+    <div class="nova-stat-line" id="read-stats"></div>
+  </div>
+  <div class="nova-card">
+    <h4>本の一覧</h4>
+    <div class="nova-list" id="read-list"></div>
+  </div>
+</div>
+
 <script>
 (function(){
   // ============ user identity (so family members don't share cloud data) ============
@@ -1123,7 +1658,8 @@
   const coreLabel = document.getElementById('core-label');
   const coreSub = document.getElementById('core-sub');
   const transcript = document.getElementById('transcript');
-  const voiceToggle = document.getElementById('voice-toggle');
+  const voiceToggle = document.getElementById('settings-voice-item');
+  const voiceToggleState = document.getElementById('settings-voice-state');
   const ringInner = document.getElementById('ringInner');
   const ticksGroup = document.getElementById('ticks');
   const canvas = document.getElementById('amp-canvas');
@@ -1215,7 +1751,8 @@
 
   // ============ Task management (local only, no API cost) ============
   const TASK_KEY = 'ratio_tasks_v1';
-  const taskBtn = document.getElementById('task-btn');
+  const taskBtn = document.getElementById('settings-task-item');
+  const taskBadge = document.getElementById('settings-task-badge');
   const taskOverlay = document.getElementById('task-overlay');
   const taskCloseBtn = document.getElementById('task-close');
   const taskInput = document.getElementById('task-input');
@@ -1288,8 +1825,7 @@
 
   function updateTaskBtnState(){
     const pending = tasks.filter(t => !t.done).length;
-    taskBtn.classList.toggle('on', pending > 0);
-    taskBtn.textContent = pending > 0 ? `📋 タスク(${pending})` : '📋 タスク';
+    taskBadge.textContent = pending > 0 ? String(pending) : '›';
   }
 
   function addTask(text, dateStr, important){
@@ -1326,6 +1862,7 @@
   // cleanupOldTasks() is invoked later, once `today`/`calEvents` are initialized (see below).
 
   taskBtn.addEventListener('click', () => {
+    closeSettings();
     taskAddDate.value = ymd(today);
     taskAddImportant.checked = false;
     taskOverlay.classList.add('open');
@@ -1443,6 +1980,13 @@
   const AI_ENABLED = false;
 
   async function handleVoiceInput(said){
+    const novaReply = tryHandleAsNovaCareTrigger(said);
+    if(novaReply !== null){
+      addLine('jarvis', novaReply);
+      speak(novaReply);
+      setState('idle');
+      return;
+    }
     const taskReply = tryHandleAsTaskCommand(said);
     if(taskReply !== null){
       addLine('jarvis', taskReply);
@@ -1484,7 +2028,8 @@
 
   // ============ calendar (local only, Monday-start month view) ============
   const CAL_KEY = 'ratio_calendar_events_v1';
-  const calBtn = document.getElementById('cal-btn');
+  const calBtn = document.getElementById('settings-cal-item');
+  const calBadge = document.getElementById('settings-cal-badge');
   const calOverlay = document.getElementById('cal-overlay');
   const calCloseBtn = document.getElementById('cal-close');
   const calPrevBtn = document.getElementById('cal-prev');
@@ -1713,6 +2258,7 @@
   }
 
   calBtn.addEventListener('click', () => {
+    closeSettings();
     calSelectedDate = ymd(today);
     calViewYear = today.getFullYear();
     calViewMonth = today.getMonth();
@@ -1794,38 +2340,30 @@
 
   function updateCalBtnState(){
     const todayCount = eventsOn(ymd(today)).length;
-    calBtn.classList.toggle('on', todayCount > 0);
+    calBadge.textContent = todayCount > 0 ? String(todayCount) : '›';
   }
   updateCalBtnState();
 
   // voice/text command support: "今日の予定は" / "明日の予定は" / "予定を教えて"
   // parse Japanese time expressions like "15時30分" / "15時" / "午後3時" / "15:30" from the start of a string
-  function extractSpokenTime(s){
-    let m = s.match(/^\s*(午前|午後)?\s*(\d{1,2})時(?:(\d{1,2})分)?\s*[、,。]?\s*(.*)$/);
+  // Convert a matched time token (e.g. "15時", "15時30分", "午後3時", "15:30") to "HH:MM".
+  function parseTimeToken(tok){
+    tok = tok.trim();
+    let m = tok.match(/^(午前|午後)?\s*(\d{1,2})時(?:(\d{1,2})分)?$/);
     if(m){
       let hour = parseInt(m[2], 10);
       const minute = m[3] ? parseInt(m[3], 10) : 0;
       if(m[1] === '午後' && hour < 12) hour += 12;
       if(m[1] === '午前' && hour === 12) hour = 0;
-      if(hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59){
-        return { time: `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`, rest: m[4].trim() };
-      }
+      if(hour>=0 && hour<=23 && minute>=0 && minute<=59) return `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
     }
-    m = s.match(/^\s*(\d{1,2}):(\d{2})\s*[、,。]?\s*(.*)$/);
+    m = tok.match(/^(午前|午後)?\s*(\d{1,2}):(\d{2})$/);
     if(m){
-      return { time: `${m[1].padStart(2,'0')}:${m[2]}`, rest: m[3].trim() };
-    }
-    return null;
-  }
-
-  // "9時から18時" / "9時30分〜18時" / "9:00〜18:00" -> { start, end, rest }
-  function extractTimeRange(s){
-    const m = s.match(/^\s*((?:午前|午後)?\s*\d{1,2}(?:時(?:\d{1,2}分)?|:\d{2}))\s*(?:から|〜|~)\s*((?:午前|午後)?\s*\d{1,2}(?:時(?:\d{1,2}分)?|:\d{2}))\s*[、,。]?\s*(.*)$/);
-    if(!m) return null;
-    const start = extractSpokenTime(m[1] + '、');
-    const end = extractSpokenTime(m[2] + '、');
-    if(start && end){
-      return { start: start.time, end: end.time, rest: m[3].trim() };
+      let hour = parseInt(m[2], 10);
+      const minute = parseInt(m[3], 10);
+      if(m[1] === '午後' && hour < 12) hour += 12;
+      if(m[1] === '午前' && hour === 12) hour = 0;
+      if(hour>=0 && hour<=23 && minute>=0 && minute<=59) return `${String(hour).padStart(2,'0')}:${String(minute).padStart(2,'0')}`;
     }
     return null;
   }
@@ -1837,52 +2375,104 @@
     const m = tok.match(/^(\d{1,2})月(\d{1,2})日$/);
     if(m){
       let d = new Date(today.getFullYear(), parseInt(m[1],10)-1, parseInt(m[2],10));
-      // if that date already passed this year by more than a month, assume next year
       return ymd(d);
     }
     return null;
   }
 
-  // "8月1日から8月3日まで" / "今日から明日まで" -> { start, end, rest }
-  function extractDateRange(s){
-    const tokenPattern = '(?:今日|明日|明後日|\\d{1,2}月\\d{1,2}日)';
-    const re = new RegExp(`^\\s*(${tokenPattern})\\s*(?:から|〜|~)\\s*(${tokenPattern})\\s*まで\\s*[、,。]?\\s*(.*)$`);
+  const TIME_TOKEN_RE = '(?:午前|午後)?\\s*\\d{1,2}(?:時(?:\\d{1,2}分)?|:\\d{2})';
+  const DATE_TOKEN_RE = '(?:今日|明日|明後日|\\d{1,2}月\\d{1,2}日)';
+
+  function stripMatch(s, m){
+    return (s.slice(0, m.index) + s.slice(m.index + m[0].length));
+  }
+
+  // Find a date range ("8月1日から8月3日まで") anywhere in the string and remove it.
+  function findAndStripDateRange(s){
+    const re = new RegExp(`(${DATE_TOKEN_RE})\\s*(?:から|〜|~)\\s*(${DATE_TOKEN_RE})\\s*まで`);
     const m = s.match(re);
     if(!m) return null;
     const start = parseSpokenDateToken(m[1]);
     const end = parseSpokenDateToken(m[2]);
-    if(start && end){
-      return { start, end, rest: m[3].trim() };
-    }
+    if(start && end) return { start, end, rest: stripMatch(s, m) };
     return null;
+  }
+
+  // Find a single date ("明日", "8月1日") anywhere in the string and remove it.
+  function findAndStripSingleDate(s){
+    const re = new RegExp(DATE_TOKEN_RE);
+    const m = s.match(re);
+    if(!m) return null;
+    const d = parseSpokenDateToken(m[0]);
+    if(!d) return null;
+    return { date: d, rest: stripMatch(s, m) };
+  }
+
+  // Find a time range ("9時から18時", "9:00〜18:00") anywhere in the string and remove it.
+  function findAndStripTimeRange(s){
+    const re = new RegExp(`(${TIME_TOKEN_RE})\\s*(?:から|〜|~)\\s*(${TIME_TOKEN_RE})(?:\\s*まで)?`);
+    const m = s.match(re);
+    if(!m) return null;
+    const start = parseTimeToken(m[1]);
+    const end = parseTimeToken(m[2]);
+    if(start && end) return { start, end, rest: stripMatch(s, m) };
+    return null;
+  }
+
+  // Find a single time ("15時", "15時から") anywhere in the string and remove it.
+  function findAndStripSingleTime(s){
+    const re = new RegExp(`(${TIME_TOKEN_RE})\\s*(?:から)?`);
+    const m = s.match(re);
+    if(!m) return null;
+    const t = parseTimeToken(m[1]);
+    if(!t) return null;
+    return { time: t, rest: stripMatch(s, m) };
+  }
+
+  // Clean up leftover connector words/punctuation once date & time chunks have been removed,
+  // so whatever remains is a clean title.
+  function cleanTitleRemainder(s){
+    return s
+      .replace(/[、,]{2,}/g, '、')
+      .replace(/^[\s、,。]+/, '')
+      .replace(/[\s、,。]+$/, '')
+      .replace(/^(から|まで|の)+/, '')
+      .replace(/(から|まで|の)+$/, '')
+      .trim();
   }
 
   function processCalAddBody(body){
     let startDate = ymd(today), endDate = null;
-    const dateRange = extractDateRange(body);
+    const dateRange = findAndStripDateRange(body);
     if(dateRange){
       startDate = dateRange.start;
       endDate = dateRange.end;
       body = dateRange.rest;
+    } else {
+      const singleDate = findAndStripSingleDate(body);
+      if(singleDate){
+        startDate = singleDate.date;
+        body = singleDate.rest;
+      }
     }
 
     let time = null, endTime = null;
-    const timeRange = extractTimeRange(body);
+    const timeRange = findAndStripTimeRange(body);
     if(timeRange){
       time = timeRange.start;
       endTime = timeRange.end;
       body = timeRange.rest;
     } else {
-      const single = extractSpokenTime(body);
-      if(single){
-        time = single.time;
-        body = single.rest;
+      const singleTime = findAndStripSingleTime(body);
+      if(singleTime){
+        time = singleTime.time;
+        body = singleTime.rest;
       }
     }
 
-    const title = body.trim();
+    const title = cleanTitleRemainder(body);
     if(!title){
-      return '予定の内容が聞き取れませんでした。「予定追加、9時から18時、出張」のように話してください。';
+      return '予定の内容が聞き取れませんでした。日付・時刻・内容を含めて話してください(例: 「明日 15時から18時 まるまる」)。';
     }
     const ev = addCalEvent(startDate, time, title, endDate, endTime);
     updateCalBtnState();
@@ -1895,7 +2485,8 @@
   function tryHandleAsCalendarCommand(said){
     const s = said.trim();
 
-    // add: "予定の追加、15時、会議" / "予定追加 9時から18時 出張" / "9時から18時 出張を予定に追加"
+    // add: date/time/title can appear in almost any order, e.g.
+    // "予定追加、8月5日 15時から18時 まるまる" / "予定追加、15時から まるまる 8月5日" / "予定追加、明日 まるまる"
     let m = s.match(/予定(?:の)?を?追加(?:して)?[、,。\s]*(.+)/);
     if(m && m[1] && m[1].trim()){
       return processCalAddBody(m[1].trim());
@@ -1926,7 +2517,7 @@
 
   // ============ memo (free-form notes, local only) ============
   const MEMO_KEY = 'ratio_memos_v1';
-  const memoBtn = document.getElementById('memo-btn');
+  const memoBtn = document.getElementById('settings-memo-item');
   const memoOverlay = document.getElementById('memo-overlay');
   const memoCloseBtn = document.getElementById('memo-close');
   const memoInput = document.getElementById('memo-input');
@@ -1976,7 +2567,7 @@
     return m;
   }
 
-  memoBtn.addEventListener('click', () => { memoOverlay.classList.add('open'); });
+  memoBtn.addEventListener('click', () => { closeSettings(); memoOverlay.classList.add('open'); });
   memoCloseBtn.addEventListener('click', () => memoOverlay.classList.remove('open'));
   memoOverlay.addEventListener('click', (e) => { if(e.target === memoOverlay) memoOverlay.classList.remove('open'); });
   memoAddBtn.addEventListener('click', () => {
@@ -2005,7 +2596,8 @@
 
   // ============ recurring reminders (local only, no push notifications) ============
   const REMINDER_KEY = 'ratio_reminders_v1';
-  const reminderBtn = document.getElementById('reminder-btn');
+  const reminderBtn = document.getElementById('settings-reminder-item');
+  const reminderBadge = document.getElementById('settings-reminder-badge');
   const reminderOverlay = document.getElementById('reminder-overlay');
   const reminderCloseBtn = document.getElementById('reminder-close');
   const reminderTitle = document.getElementById('reminder-title');
@@ -2070,10 +2662,11 @@
 
   function updateReminderBtnState(){
     const dueTodayCount = reminders.filter(reminderAppliesToday).length;
-    reminderBtn.classList.toggle('on', dueTodayCount > 0);
+    reminderBadge.textContent = dueTodayCount > 0 ? String(dueTodayCount) : '›';
   }
 
   reminderBtn.addEventListener('click', () => {
+    closeSettings();
     renderReminders();
     updateReminderBtnState();
     reminderOverlay.classList.add('open');
@@ -2205,8 +2798,7 @@
 
   voiceToggle.addEventListener('click', () => {
     voiceOn = !voiceOn;
-    voiceToggle.classList.toggle('on', voiceOn);
-    voiceToggle.textContent = voiceOn ? '🔊 音声ON' : '🔇 音声OFF';
+    voiceToggleState.textContent = voiceOn ? 'ON' : 'OFF';
     if(!voiceOn) window.speechSynthesis.cancel();
   });
 
@@ -2380,15 +2972,800 @@
         renderReminders();
         updateReminderBtnState();
       }
+      if(Array.isArray(data.novaWeights)){
+        novaWeights = data.novaWeights;
+        try{ localStorage.setItem(NOVA_WEIGHT_KEY, JSON.stringify(novaWeights)); }catch(e){}
+        renderNovaWeights();
+        if(typeof novaWeightGraphScreen !== 'undefined' && novaWeightGraphScreen.classList.contains('show')) renderNovaWeightGraph();
+      }
+      if(Array.isArray(data.novaMeals)){
+        novaMeals = data.novaMeals;
+        try{ localStorage.setItem(NOVA_MEAL_KEY, JSON.stringify(novaMeals)); }catch(e){}
+        renderNovaMeals();
+      }
+      if(Array.isArray(data.walletEntries)){
+        walletEntries = data.walletEntries;
+        try{ localStorage.setItem(WALLET_KEY, JSON.stringify(walletEntries)); }catch(e){}
+        if(typeof walletScreen !== 'undefined' && walletScreen.classList.contains('show')) renderWalletStats();
+        if(typeof walletMonthlyScreen !== 'undefined' && walletMonthlyScreen.classList.contains('show')){ renderWalletChart(); renderWalletList(); }
+      }
+      if(Array.isArray(data.habits)){
+        habits = data.habits;
+        try{ localStorage.setItem(HABIT_KEY, JSON.stringify(habits)); }catch(e){}
+        if(typeof habitScreen !== 'undefined' && habitScreen.classList.contains('show')) renderHabits();
+      }
+      if(Array.isArray(data.fitEntries)){
+        fitEntries = data.fitEntries;
+        try{ localStorage.setItem(FIT_KEY, JSON.stringify(fitEntries)); }catch(e){}
+        if(typeof fitScreen !== 'undefined' && fitScreen.classList.contains('show')) renderFit();
+      }
+      if(Array.isArray(data.readBooks)){
+        readBooks = data.readBooks;
+        try{ localStorage.setItem(READ_KEY, JSON.stringify(readBooks)); }catch(e){}
+        if(typeof readScreen !== 'undefined' && readScreen.classList.contains('show')) renderRead();
+      }
     } finally {
       applyingRemoteFlag = false;
     }
   };
 
   window.RatioGetLocalData = function(){
-    return { tasks, calEvents, memos, reminders };
+    return { tasks, calEvents, memos, reminders, novaWeights, novaMeals, walletEntries, habits, fitEntries, readBooks };
   };
   // ============ end cloud sync apply ============
+
+  // ============ settings screen ============
+  const settingsBtn = document.getElementById('settings-btn');
+  const settingsOverlay = document.getElementById('settings-overlay');
+  const settingsClose = document.getElementById('settings-close');
+  const settingsNovaItem = document.getElementById('settings-nova-item');
+
+  const settingsViews = {
+    main: document.getElementById('settings-main-view'),
+    usability: document.getElementById('settings-usability-view'),
+    controlcenter: document.getElementById('settings-controlcenter-view'),
+    capability: document.getElementById('settings-capability-view'),
+  };
+  function showSettingsView(name){
+    Object.values(settingsViews).forEach(v => v.style.display = 'none');
+    settingsViews[name].style.display = 'block';
+  }
+  document.getElementById('settings-cat-usability').addEventListener('click', () => showSettingsView('usability'));
+  document.getElementById('settings-cat-controlcenter').addEventListener('click', () => showSettingsView('controlcenter'));
+  document.getElementById('settings-cat-capability').addEventListener('click', () => showSettingsView('capability'));
+  document.querySelectorAll('.settings-back-btn').forEach(btn => {
+    btn.addEventListener('click', () => showSettingsView('main'));
+  });
+
+  function openSettings(){ showSettingsView('main'); settingsOverlay.classList.add('open'); }
+  function closeSettings(){ settingsOverlay.classList.remove('open'); }
+  settingsBtn.addEventListener('click', openSettings);
+  settingsClose.addEventListener('click', closeSettings);
+  settingsOverlay.addEventListener('click', (e) => { if(e.target === settingsOverlay) closeSettings(); });
+  settingsNovaItem.addEventListener('click', () => openNovaCare());
+  document.getElementById('settings-wallet-item').addEventListener('click', () => openNovaWallet());
+  document.getElementById('settings-habit-item').addEventListener('click', () => openNovaHabit());
+  document.getElementById('settings-fit-item').addEventListener('click', () => openNovaFit());
+  document.getElementById('settings-read-item').addEventListener('click', () => openNovaRead());
+  // ============ end settings screen ============
+
+  // ============ Nova Care (health sub-screen) ============
+  const NOVA_WEIGHT_KEY = 'ratio_nova_weights_v1';
+  const NOVA_MEAL_KEY = 'ratio_nova_meals_v1';
+  const NOVA_GOAL_KEY = 'ratio_nova_goal_v1';
+
+  const novaScreen = document.getElementById('nova-screen');
+  const novaBack = document.getElementById('nova-back');
+
+  // Shared helper: close whichever Nova sub-app screen is open, and return to
+  // the Settings > Usability list (where all of these are launched from) rather than the home screen.
+  function backToSettingsUsability(){
+    showSettingsView('usability');
+    settingsOverlay.classList.add('open');
+  }
+
+  function openNovaCare(){
+    closeSettings();
+    novaScreen.classList.add('show');
+    novaWeightDate.value = ymd(today);
+    renderNovaWeights();
+    renderNovaMeals();
+  }
+  function closeNovaCare(){
+    novaScreen.classList.remove('show');
+    backToSettingsUsability();
+  }
+  novaBack.addEventListener('click', closeNovaCare);
+
+  // --- weight log ---
+  const novaWeightDate = document.getElementById('nova-weight-date');
+  const novaWeightInput = document.getElementById('nova-weight-input');
+  const novaWeightAdd = document.getElementById('nova-weight-add');
+  const novaWeightStats = document.getElementById('nova-weight-stats');
+  const novaWeightList = document.getElementById('nova-weight-list');
+
+  function loadNovaWeights(){
+    try{ const raw = localStorage.getItem(NOVA_WEIGHT_KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveNovaWeights(w){
+    try{ localStorage.setItem(NOVA_WEIGHT_KEY, JSON.stringify(w)); }catch(e){}
+    pushToCloud();
+  }
+  let novaWeights = loadNovaWeights(); // { id, date, kg }
+
+  function renderNovaWeights(){
+    const sorted = [...novaWeights].sort((a,b) => b.date.localeCompare(a.date));
+    novaWeightList.innerHTML = '';
+    if(sorted.length === 0){
+      novaWeightList.innerHTML = '<div class="nova-empty">記録はまだありません</div>';
+    } else {
+      sorted.forEach(w => {
+        const row = document.createElement('div');
+        row.className = 'nova-list-item';
+        row.innerHTML = `<div class="nl-date">${w.date.slice(5).replace('-','/')}</div><div class="nl-main">${w.kg} kg</div><button class="nl-del">✕</button>`;
+        row.querySelector('.nl-del').addEventListener('click', () => {
+          novaWeights = novaWeights.filter(x => x.id !== w.id);
+          saveNovaWeights(novaWeights);
+          renderNovaWeights();
+        });
+        novaWeightList.appendChild(row);
+      });
+    }
+    if(sorted.length > 0){
+      const latest = sorted[0];
+      const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate()-7);
+      const weekAgoStr = ymd(weekAgo);
+      const past = sorted.find(w => w.date <= weekAgoStr);
+      let diffText = '';
+      if(past){
+        const diff = (latest.kg - past.kg).toFixed(1);
+        diffText = ` (7日前比 ${diff > 0 ? '+' : ''}${diff}kg)`;
+      }
+      novaWeightStats.innerHTML = `最新: <b>${latest.kg}kg</b>${diffText}`;
+    } else {
+      novaWeightStats.textContent = '';
+    }
+  }
+
+  function addNovaWeight(dateStr, kg){
+    if(!kg || isNaN(kg)) return null;
+    const existing = novaWeights.find(w => w.date === dateStr);
+    if(existing){
+      existing.kg = kg;
+    } else {
+      novaWeights.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: dateStr, kg });
+    }
+    saveNovaWeights(novaWeights);
+    renderNovaWeights();
+    if(novaWeightGraphScreen.classList.contains('show')) renderNovaWeightGraph();
+    return true;
+  }
+
+  novaWeightAdd.addEventListener('click', () => {
+    const kg = parseFloat(novaWeightInput.value);
+    if(addNovaWeight(novaWeightDate.value || ymd(today), kg)){
+      novaWeightInput.value = '';
+    }
+  });
+
+  // --- weight graph screen ---
+  const novaWeightGraphScreen = document.getElementById('nova-weight-graph-screen');
+  const novaWeightGraphOpen = document.getElementById('nova-weight-graph-open');
+  const novaWeightGraphBack = document.getElementById('nova-weight-graph-back');
+  const novaWeightGraphContainer = document.getElementById('nova-weight-graph-container');
+
+  function openNovaWeightGraph(){
+    novaWeightGraphScreen.classList.add('show');
+    renderNovaWeightGraph();
+    renderNovaWeights(); // populate the list now living on this screen
+  }
+  function closeNovaWeightGraph(){
+    novaWeightGraphScreen.classList.remove('show');
+  }
+  novaWeightGraphOpen.addEventListener('click', openNovaWeightGraph);
+  novaWeightGraphBack.addEventListener('click', closeNovaWeightGraph);
+
+  function renderNovaWeightGraph(){
+    const sorted = [...novaWeights].sort((a,b) => a.date.localeCompare(b.date));
+    if(sorted.length === 0){
+      novaWeightGraphContainer.innerHTML = '<div class="nova-weight-empty">まだ記録がありません。体重を記録するとここにグラフが表示されます。</div>';
+      return;
+    }
+    if(sorted.length === 1){
+      novaWeightGraphContainer.innerHTML = `<div class="nova-weight-empty">記録が1件のみです。もう少し記録が増えるとグラフが表示されます。(現在: ${sorted[0].kg}kg)</div>`;
+      return;
+    }
+
+    const W = 320, H = 160, padL = 34, padR = 10, padT = 14, padB = 22;
+    const kgs = sorted.map(w => w.kg);
+    let minKg = Math.min(...kgs), maxKg = Math.max(...kgs);
+    if(minKg === maxKg){ minKg -= 1; maxKg += 1; }
+    const kgPad = (maxKg - minKg) * 0.15 || 1;
+    minKg -= kgPad; maxKg += kgPad;
+
+    const n = sorted.length;
+    const xFor = i => padL + (i/(n-1)) * (W - padL - padR);
+    const yFor = kg => padT + (1 - (kg - minKg)/(maxKg - minKg)) * (H - padT - padB);
+
+    const points = sorted.map((w,i) => `${xFor(i).toFixed(1)},${yFor(w.kg).toFixed(1)}`).join(' ');
+    const dots = sorted.map((w,i) => `<circle cx="${xFor(i).toFixed(1)}" cy="${yFor(w.kg).toFixed(1)}" r="3" fill="#4ade9a"/>`).join('');
+
+    // horizontal gridlines + kg labels (min/mid/max)
+    const midKg = (minKg + maxKg) / 2;
+    const gridLines = [minKg, midKg, maxKg].map(kg => {
+      const y = yFor(kg).toFixed(1);
+      return `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#12331f" stroke-width="1"/>
+              <text x="4" y="${Number(y)+3}" font-size="8" fill="#6f9481" font-family="JetBrains Mono, monospace">${kg.toFixed(1)}</text>`;
+    }).join('');
+
+    const firstLabel = sorted[0].date.slice(5).replace('-','/');
+    const lastLabel = sorted[n-1].date.slice(5).replace('-','/');
+
+    novaWeightGraphContainer.innerHTML = `
+      <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+        ${gridLines}
+        <polyline points="${points}" fill="none" stroke="#4ade9a" stroke-width="2"/>
+        ${dots}
+        <text x="${padL}" y="${H-6}" font-size="8" fill="#6f9481" font-family="JetBrains Mono, monospace">${firstLabel}</text>
+        <text x="${W-padR}" y="${H-6}" font-size="8" fill="#6f9481" font-family="JetBrains Mono, monospace" text-anchor="end">${lastLabel}</text>
+      </svg>`;
+  }
+
+  // --- meal / calorie log ---
+  const novaMealName = document.getElementById('nova-meal-name');
+  const novaMealAdd = document.getElementById('nova-meal-add');
+  const novaMealStats = document.getElementById('nova-meal-stats');
+  const novaMealList = document.getElementById('nova-meal-list');
+
+  // Rough approximate calorie values for common foods (per typical serving) - not precise nutrition data.
+  const NOVA_FOOD_PRESETS = [
+    // 主食・ごはんもの
+    { n:'白米(茶碗1杯)', k:240 }, { n:'玄米(茶碗1杯)', k:230 }, { n:'食パン1枚', k:160 },
+    { n:'おにぎり1個', k:180 }, { n:'チャーハン', k:650 }, { n:'オムライス', k:700 },
+    { n:'牛丼並', k:730 }, { n:'親子丼', k:670 }, { n:'カツ丼', k:900 }, { n:'天丼', k:800 },
+    { n:'中華丼', k:650 }, { n:'ビビンバ', k:620 }, { n:'カレーライス', k:700 },
+    { n:'ハヤシライス', k:650 }, { n:'ドリア', k:600 }, { n:'おでん', k:250 },
+    { n:'寿司(1貫)', k:45 }, { n:'手巻き寿司1本', k:150 }, { n:'いなり寿司1個', k:120 },
+    // 麺類
+    { n:'ラーメン', k:500 }, { n:'焼きそば', k:550 }, { n:'うどん', k:400 },
+    { n:'そば', k:350 }, { n:'焼きうどん', k:500 }, { n:'つけ麺', k:600 },
+    { n:'冷やし中華', k:450 }, { n:'パスタ(ミートソース)', k:650 },
+    { n:'ペペロンチーノ', k:500 }, { n:'カルボナーラ', k:750 }, { n:'ナポリタン', k:600 },
+    { n:'にゅうめん', k:300 }, { n:'皿うどん', k:600 },
+    // 揚げ物・肉料理
+    { n:'唐揚げ(5個)', k:400 }, { n:'とんかつ', k:500 }, { n:'エビフライ(3尾)', k:350 },
+    { n:'コロッケ1個', k:220 }, { n:'天ぷら盛り合わせ', k:400 }, { n:'フライドポテト(M)', k:400 },
+    { n:'ハンバーグ', k:450 }, { n:'餃子(5個)', k:250 }, { n:'焼き餃子1個', k:50 },
+    { n:'焼き鳥1本', k:100 }, { n:'豚の生姜焼き', k:450 }, { n:'酢豚', k:500 },
+    { n:'麻婆豆腐', k:400 }, { n:'春巻き1本', k:120 }, { n:'肉じゃが', k:350 },
+    { n:'鶏むね肉100g', k:110 }, { n:'鶏もも肉100g', k:200 }, { n:'牛肉100g', k:250 },
+    { n:'豚肉100g', k:260 }, { n:'ステーキ200g', k:500 }, { n:'しゃぶしゃぶ(1人前)', k:400 },
+    // パン・軽食
+    { n:'メロンパン', k:450 }, { n:'クロワッサン', k:250 }, { n:'サンドイッチ', k:350 },
+    { n:'ハンバーガー', k:500 }, { n:'ホットドッグ', k:300 }, { n:'ピザ1切れ', k:250 },
+    { n:'お好み焼き', k:550 }, { n:'たこ焼き(8個)', k:350 }, { n:'たこ焼き1個', k:45 },
+    // 汁物・副菜
+    { n:'味噌汁', k:40 }, { n:'コーンスープ', k:120 }, { n:'ポテトサラダ', k:150 },
+    { n:'サラダ', k:50 }, { n:'卵焼き', k:150 }, { n:'卵1個', k:80 },
+    { n:'納豆1パック', k:80 }, { n:'豆腐半丁', k:100 }, { n:'枝豆(1皿)', k:130 },
+    { n:'冷奴', k:100 },
+    // 果物・乳製品
+    { n:'バナナ1本', k:90 }, { n:'りんご1個', k:130 }, { n:'ヨーグルト', k:100 },
+    { n:'牛乳コップ1杯', k:130 }, { n:'チーズ1切れ', k:80 },
+    // 飲み物
+    { n:'コーヒー(ブラック)', k:5 }, { n:'カフェラテ', k:120 }, { n:'ビール(350ml)', k:140 },
+    { n:'日本酒(1合)', k:190 }, { n:'ワイン(1杯)', k:90 }, { n:'ハイボール', k:70 },
+    { n:'オレンジジュース', k:110 }, { n:'コーラ(350ml)', k:150 },
+    // お菓子・デザート
+    { n:'ケーキ1切れ', k:350 }, { n:'アイスクリーム', k:180 }, { n:'ポテトチップス(1袋)', k:330 },
+    { n:'チョコレート板1枚', k:280 }, { n:'どら焼き1個', k:230 }, { n:'たい焼き1個', k:220 },
+    { n:'プリン1個', k:150 }, { n:'ドーナツ1個', k:250 }
+  ];
+
+  // Look up an approximate calorie value for a typed food name (partial match, local presets only).
+  function lookupNovaFoodKcal(q){
+    if(!q) return null;
+    const match = NOVA_FOOD_PRESETS.find(f => f.n.includes(q) || q.includes(f.n.replace(/\(.*?\)/,'')));
+    return match ? match.k : null;
+  }
+
+  // Fall back to the free, worldwide Open Food Facts database (3M+ products, no API key needed)
+  // when the food isn't in our small local preset list.
+  async function lookupOpenFoodFacts(q){
+    try{
+      const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=1`;
+      const res = await fetch(url);
+      const data = await res.json();
+      const p = data.products && data.products[0];
+      if(p && p.nutriments){
+        const per100g = p.nutriments['energy-kcal_100g'];
+        const perServing = p.nutriments['energy-kcal_serving'];
+        if(perServing) return { kcal: Math.round(perServing), per100g: false, matchedName: p.product_name };
+        if(per100g) return { kcal: Math.round(per100g), per100g: true, matchedName: p.product_name };
+      }
+    }catch(e){
+      console.warn('Open Food Facts lookup failed:', e);
+    }
+    return null;
+  }
+
+  function loadNovaMeals(){
+    try{ const raw = localStorage.getItem(NOVA_MEAL_KEY); return raw ? JSON.parse(raw) : []; }
+    catch(e){ return []; }
+  }
+  function saveNovaMeals(m){
+    try{ localStorage.setItem(NOVA_MEAL_KEY, JSON.stringify(m)); }catch(e){}
+    pushToCloud();
+  }
+  let novaMeals = loadNovaMeals(); // { id, date, name, kcal, pending, per100g }
+
+  function renderNovaMeals(){
+    const todayStr = ymd(today);
+    const todays = novaMeals.filter(m => m.date === todayStr);
+    novaMealList.innerHTML = '';
+    if(todays.length === 0){
+      novaMealList.innerHTML = '<div class="nova-empty">今日の記録はまだありません</div>';
+    } else {
+      todays.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'nova-list-item';
+        let kcalLabel;
+        if(m.pending) kcalLabel = '計算中…';
+        else if(m.kcal != null) kcalLabel = `${m.kcal}kcal${m.per100g ? '(100gあたりの目安)' : ''}`;
+        else kcalLabel = 'kcal不明';
+        row.innerHTML = `<div class="nl-main">${m.name || '(名称未設定)'} - ${kcalLabel}</div><button class="nl-del">✕</button>`;
+        row.querySelector('.nl-del').addEventListener('click', () => {
+          novaMeals = novaMeals.filter(x => x.id !== m.id);
+          saveNovaMeals(novaMeals);
+          renderNovaMeals();
+        });
+        novaMealList.appendChild(row);
+      });
+    }
+    const total = todays.reduce((sum,m) => sum + (m.kcal || 0), 0);
+    novaMealStats.innerHTML = `今日の合計: <b>${total}kcal</b>`;
+  }
+
+  async function addNovaMeal(dateStr, name, kcal){
+    const trimmedName = (name||'').trim();
+    if(!trimmedName) return null;
+
+    if(kcal != null && !isNaN(kcal)){
+      novaMeals.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: dateStr, name: trimmedName, kcal: Number(kcal) });
+      saveNovaMeals(novaMeals);
+      renderNovaMeals();
+      return true;
+    }
+
+    // 1) try the small local preset list first (instant, no network needed)
+    const localKcal = lookupNovaFoodKcal(trimmedName);
+    const entry = {
+      id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
+      date: dateStr, name: trimmedName,
+      kcal: localKcal, pending: localKcal == null, per100g: false
+    };
+    novaMeals.push(entry);
+    renderNovaMeals();
+    if(localKcal != null){
+      saveNovaMeals(novaMeals);
+      return true;
+    }
+
+    // 2) fall back to the worldwide Open Food Facts database
+    const found = await lookupOpenFoodFacts(trimmedName);
+    entry.pending = false;
+    if(found){
+      entry.kcal = found.kcal;
+      entry.per100g = found.per100g;
+    }
+    saveNovaMeals(novaMeals);
+    renderNovaMeals();
+    return true;
+  }
+
+  novaMealAdd.addEventListener('click', () => {
+    const name = novaMealName.value;
+    if(!name.trim()) return;
+    novaMealName.value = '';
+    addNovaMeal(ymd(today), name, null);
+  });
+  novaMealName.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') novaMealAdd.click();
+  });
+
+  // --- goal calculator (Mifflin-St Jeor) ---
+  const novaGender = document.getElementById('nova-gender');
+  const novaAge = document.getElementById('nova-age');
+  const novaHeight = document.getElementById('nova-height');
+  const novaActivity = document.getElementById('nova-activity');
+  const novaTargetWeight = document.getElementById('nova-target-weight');
+  const novaGoalCalc = document.getElementById('nova-goal-calc');
+  const novaGoalResult = document.getElementById('nova-goal-result');
+
+  function loadNovaGoal(){
+    try{ const raw = localStorage.getItem(NOVA_GOAL_KEY); return raw ? JSON.parse(raw) : null; }
+    catch(e){ return null; }
+  }
+  function saveNovaGoal(g){
+    try{ localStorage.setItem(NOVA_GOAL_KEY, JSON.stringify(g)); }catch(e){}
+  }
+  const savedGoal = loadNovaGoal();
+  if(savedGoal){
+    novaGender.value = savedGoal.gender || 'male';
+    novaAge.value = savedGoal.age || '';
+    novaHeight.value = savedGoal.height || '';
+    novaActivity.value = savedGoal.activity || '1.375';
+    novaTargetWeight.value = savedGoal.targetWeight || '';
+  }
+
+  novaGoalCalc.addEventListener('click', () => {
+    const gender = novaGender.value;
+    const age = parseFloat(novaAge.value);
+    const height = parseFloat(novaHeight.value);
+    const activity = parseFloat(novaActivity.value);
+    const targetWeight = parseFloat(novaTargetWeight.value);
+    const latestWeightEntry = [...novaWeights].sort((a,b) => b.date.localeCompare(a.date))[0];
+    const currentWeight = latestWeightEntry ? latestWeightEntry.kg : null;
+
+    if(!age || !height || !currentWeight){
+      novaGoalResult.textContent = '年齢・身長・現在の体重(体重記録が必要です)を入力してください。';
+      return;
+    }
+
+    saveNovaGoal({ gender, age, height, activity, targetWeight });
+
+    // Mifflin-St Jeor BMR
+    let bmr;
+    if(gender === 'male'){
+      bmr = 10*currentWeight + 6.25*height - 5*age + 5;
+    } else {
+      bmr = 10*currentWeight + 6.25*height - 5*age - 161;
+    }
+    const tdee = Math.round(bmr * activity);
+
+    let msg = `維持カロリーの目安: <b>${tdee}kcal/日</b>`;
+    if(targetWeight && currentWeight){
+      const diff = targetWeight - currentWeight;
+      // Safe, moderate deficit/surplus: ~500kcal/day for roughly 0.5kg/week change.
+      let target = diff < 0 ? tdee - 500 : (diff > 0 ? tdee + 500 : tdee);
+      // Keep a sensible floor so we never suggest an unsafely low intake.
+      const floor = gender === 'male' ? 1500 : 1200;
+      if(target < floor) target = floor;
+      msg += `<br>目標(${targetWeight}kg)に向けた目安: <b>${target}kcal/日</b>`;
+      if(diff !== 0){
+        const weeks = Math.abs(diff) / 0.5;
+        msg += `<br>週あたり約0.5kgペースの場合、目安期間: 約${Math.ceil(weeks)}週間`;
+      }
+    }
+    novaGoalResult.innerHTML = msg;
+  });
+
+  // voice/text trigger: saying "ノヴァケア" / "Nova Care" switches screens
+  function tryHandleAsNovaCareTrigger(said){
+    const s = said.trim();
+    if(/ノヴァウォレット|nova\s?wallet/i.test(s)){
+      openNovaWallet();
+      return 'Nova Walletを起動します。';
+    }
+    if(/ノヴァハビット|nova\s?habit/i.test(s)){
+      openNovaHabit();
+      return 'Nova Habitを起動します。';
+    }
+    if(/ノヴァフィット|nova\s?fit/i.test(s)){
+      openNovaFit();
+      return 'Nova Fitを起動します。';
+    }
+    if(/ノヴァリード|nova\s?read/i.test(s)){
+      openNovaRead();
+      return 'Nova Readを起動します。';
+    }
+    if(/ノヴァケア|nova\s?care/i.test(s)){
+      openNovaCare();
+      return 'Nova Careを起動します。';
+    }
+    return null;
+  }
+  // ============ end Nova Care ============
+
+  // ============ Nova Wallet ============
+  const WALLET_KEY = 'ratio_nova_wallet_v1';
+  const walletScreen = document.getElementById('nova-wallet-screen');
+  document.getElementById('nova-wallet-back').addEventListener('click', () => { walletScreen.classList.remove('show'); backToSettingsUsability(); });
+  function openNovaWallet(){
+    closeSettings();
+    walletScreen.classList.add('show');
+    walletDate.value = ymd(today);
+    renderWalletStats();
+  }
+
+  function loadWallet(){ try{ const r = localStorage.getItem(WALLET_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+  function saveWallet(w){ try{ localStorage.setItem(WALLET_KEY, JSON.stringify(w)); }catch(e){} pushToCloud(); }
+  let walletEntries = loadWallet(); // { id, date, category, amount, memo }
+
+  const walletDate = document.getElementById('wallet-date');
+  const walletCategory = document.getElementById('wallet-category');
+  const walletAmount = document.getElementById('wallet-amount');
+  const walletMemo = document.getElementById('wallet-memo');
+  const walletStats = document.getElementById('wallet-stats');
+  const walletList = document.getElementById('wallet-list');
+
+  function walletMonthEntries(){
+    const ymPrefix = ymd(today).slice(0,7); // YYYY-MM
+    return walletEntries.filter(e => e.date.startsWith(ymPrefix)).sort((a,b) => b.date.localeCompare(a.date));
+  }
+
+  function renderWalletStats(){
+    const total = walletMonthEntries().reduce((s,e) => s+e.amount, 0);
+    walletStats.innerHTML = `今月の合計: <b>¥${total.toLocaleString()}</b>`;
+  }
+
+  function renderWalletList(){
+    const monthEntries = walletMonthEntries();
+    walletList.innerHTML = '';
+    if(monthEntries.length === 0){
+      walletList.innerHTML = '<div class="nova-empty">今月の記録はまだありません</div>';
+    } else {
+      monthEntries.forEach(e => {
+        const row = document.createElement('div');
+        row.className = 'nova-list-item';
+        row.innerHTML = `<div class="nl-date">${e.date.slice(5).replace('-','/')}</div><div class="nl-main">[${e.category}] ¥${e.amount.toLocaleString()} ${e.memo?('- '+e.memo):''}</div><button class="nl-del">✕</button>`;
+        row.querySelector('.nl-del').addEventListener('click', () => {
+          walletEntries = walletEntries.filter(x => x.id !== e.id);
+          saveWallet(walletEntries);
+          renderWalletList();
+          renderWalletChart();
+          renderWalletStats();
+        });
+        walletList.appendChild(row);
+      });
+    }
+  }
+
+  const WALLET_CATEGORIES = ['食費','交通費','娯楽','日用品','その他'];
+  function renderWalletChart(){
+    const container = document.getElementById('wallet-chart-container');
+    const monthEntries = walletMonthEntries();
+    if(monthEntries.length === 0){
+      container.innerHTML = '<div class="nova-empty">今月の記録はまだありません</div>';
+      return;
+    }
+    const totals = WALLET_CATEGORIES.map(cat => ({
+      cat, total: monthEntries.filter(e => e.category === cat).reduce((s,e) => s+e.amount, 0)
+    })).filter(x => x.total > 0);
+    const maxTotal = Math.max(...totals.map(x => x.total), 1);
+
+    const barsHtml = totals.map(x => {
+      const pct = Math.round((x.total / maxTotal) * 100);
+      return `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:#e8dcc8;margin-bottom:4px;">
+            <span>${x.cat}</span><span>¥${x.total.toLocaleString()}</span>
+          </div>
+          <div style="background:#231908;border-radius:6px;height:14px;overflow:hidden;">
+            <div style="width:${pct}%;height:100%;background:#ffb454;border-radius:6px;"></div>
+          </div>
+        </div>`;
+    }).join('');
+    container.innerHTML = barsHtml;
+  }
+
+  document.getElementById('wallet-add').addEventListener('click', () => {
+    const amount = parseFloat(walletAmount.value);
+    if(!amount || isNaN(amount)) return;
+    const dateStr = walletDate.value || ymd(today);
+    walletEntries.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: dateStr, category: walletCategory.value, amount, memo: walletMemo.value.trim() });
+    saveWallet(walletEntries);
+    renderWalletStats();
+    walletAmount.value = ''; walletMemo.value = '';
+  });
+
+  const walletMonthlyScreen = document.getElementById('nova-wallet-monthly-screen');
+  document.getElementById('wallet-monthly-open').addEventListener('click', () => {
+    walletScreen.classList.remove('show');
+    walletMonthlyScreen.classList.add('show');
+    renderWalletChart();
+    renderWalletList();
+  });
+  document.getElementById('nova-wallet-monthly-back').addEventListener('click', () => {
+    walletMonthlyScreen.classList.remove('show');
+    walletScreen.classList.add('show');
+  });
+  // ============ end Nova Wallet ============
+
+  // ============ Nova Habit ============
+  const HABIT_KEY = 'ratio_nova_habit_v1';
+  const habitScreen = document.getElementById('nova-habit-screen');
+  const habitCheckDate = document.getElementById('habit-check-date');
+  document.getElementById('nova-habit-back').addEventListener('click', () => { habitScreen.classList.remove('show'); backToSettingsUsability(); });
+  function openNovaHabit(){
+    closeSettings();
+    habitScreen.classList.add('show');
+    habitCheckDate.value = ymd(today);
+    renderHabits();
+  }
+  habitCheckDate.addEventListener('change', renderHabits);
+
+  function loadHabits(){ try{ const r = localStorage.getItem(HABIT_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+  function saveHabits(h){ try{ localStorage.setItem(HABIT_KEY, JSON.stringify(h)); }catch(e){} pushToCloud(); }
+  let habits = loadHabits(); // { id, name, doneDates: ['YYYY-MM-DD', ...] }
+
+  function habitStreak(h){
+    let streak = 0;
+    let d = new Date(today);
+    while(h.doneDates.includes(ymd(d))){
+      streak++;
+      d.setDate(d.getDate()-1);
+    }
+    return streak;
+  }
+
+  function renderHabits(){
+    const habitList = document.getElementById('habit-list');
+    const targetDate = habitCheckDate.value || ymd(today);
+    const titleEl = document.getElementById('habit-list-title');
+    titleEl.textContent = targetDate === ymd(today) ? '今日のチェック' : `${targetDate.slice(5).replace('-','/')}のチェック`;
+    habitList.innerHTML = '';
+    if(habits.length === 0){
+      habitList.innerHTML = '<div class="nova-empty">習慣はまだ登録されていません</div>';
+      return;
+    }
+    habits.forEach(h => {
+      const done = h.doneDates.includes(targetDate);
+      const row = document.createElement('div');
+      row.className = 'nova-list-item';
+      row.innerHTML = `<input type="checkbox" class="task-important-check" ${done?'checked':''}><div class="nl-main">${h.name} (連続${habitStreak(h)}日)</div><button class="nl-del">✕</button>`;
+      row.querySelector('input').addEventListener('change', (e) => {
+        if(e.target.checked){
+          if(!h.doneDates.includes(targetDate)) h.doneDates.push(targetDate);
+        } else {
+          h.doneDates = h.doneDates.filter(d => d !== targetDate);
+        }
+        saveHabits(habits);
+        renderHabits();
+      });
+      row.querySelector('.nl-del').addEventListener('click', () => {
+        habits = habits.filter(x => x.id !== h.id);
+        saveHabits(habits);
+        renderHabits();
+      });
+      habitList.appendChild(row);
+    });
+  }
+  document.getElementById('habit-add').addEventListener('click', () => {
+    const nameEl = document.getElementById('habit-name');
+    if(!nameEl.value.trim()) return;
+    habits.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), name: nameEl.value.trim(), doneDates: [] });
+    saveHabits(habits);
+    renderHabits();
+    nameEl.value = '';
+  });
+  // ============ end Nova Habit ============
+
+  // ============ Nova Fit ============
+  const FIT_KEY = 'ratio_nova_fit_v1';
+  const fitScreen = document.getElementById('nova-fit-screen');
+  const fitDate = document.getElementById('fit-date');
+  document.getElementById('nova-fit-back').addEventListener('click', () => { fitScreen.classList.remove('show'); backToSettingsUsability(); });
+  function openNovaFit(){
+    closeSettings();
+    fitScreen.classList.add('show');
+    fitDate.value = ymd(today);
+    renderFit();
+  }
+
+  function loadFit(){ try{ const r = localStorage.getItem(FIT_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+  function saveFit(f){ try{ localStorage.setItem(FIT_KEY, JSON.stringify(f)); }catch(e){} pushToCloud(); }
+  let fitEntries = loadFit(); // { id, date, exercise, detail }
+
+  function renderFit(){
+    const targetDate = fitDate.value || ymd(today);
+    const titleEl = document.getElementById('fit-list-title');
+    titleEl.textContent = targetDate === ymd(today) ? '今日の記録' : `${targetDate.slice(5).replace('-','/')}の記録`;
+    const todays = fitEntries.filter(e => e.date === targetDate);
+    const fitList = document.getElementById('fit-list');
+    fitList.innerHTML = '';
+    if(todays.length === 0){
+      fitList.innerHTML = '<div class="nova-empty">記録はまだありません</div>';
+    } else {
+      todays.forEach(e => {
+        const row = document.createElement('div');
+        row.className = 'nova-list-item';
+        row.innerHTML = `<div class="nl-main">${e.exercise}${e.detail?(' - '+e.detail):''}</div><button class="nl-del">✕</button>`;
+        row.querySelector('.nl-del').addEventListener('click', () => {
+          fitEntries = fitEntries.filter(x => x.id !== e.id);
+          saveFit(fitEntries);
+          renderFit();
+        });
+        fitList.appendChild(row);
+      });
+    }
+    const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate()-6);
+    const weekCount = new Set(fitEntries.filter(e => e.date >= ymd(weekAgo)).map(e => e.date)).size;
+    document.getElementById('fit-stats').innerHTML = `今週トレーニングした日数: <b>${weekCount}日</b>`;
+  }
+  fitDate.addEventListener('change', renderFit);
+  document.getElementById('fit-add').addEventListener('click', () => {
+    const exEl = document.getElementById('fit-exercise');
+    const detailEl = document.getElementById('fit-detail');
+    if(!exEl.value.trim()) return;
+    const dateStr = fitDate.value || ymd(today);
+    fitEntries.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: dateStr, exercise: exEl.value.trim(), detail: detailEl.value.trim() });
+    saveFit(fitEntries);
+    renderFit();
+    exEl.value = ''; detailEl.value = '';
+  });
+  // ============ end Nova Fit ============
+
+  // ============ Nova Read ============
+  const READ_KEY = 'ratio_nova_read_v1';
+  const readScreen = document.getElementById('nova-read-screen');
+  const readDate = document.getElementById('read-date');
+  document.getElementById('nova-read-back').addEventListener('click', () => { readScreen.classList.remove('show'); backToSettingsUsability(); });
+  function openNovaRead(){
+    closeSettings();
+    readScreen.classList.add('show');
+    readDate.value = ymd(today);
+    renderRead();
+  }
+
+  function loadRead(){ try{ const r = localStorage.getItem(READ_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+  function saveRead(r){ try{ localStorage.setItem(READ_KEY, JSON.stringify(r)); }catch(e){} pushToCloud(); }
+  let readBooks = loadRead(); // { id, title, status, dateAdded, review }
+
+  function renderRead(){
+    const readList = document.getElementById('read-list');
+    readList.innerHTML = '';
+    if(readBooks.length === 0){
+      readList.innerHTML = '<div class="nova-empty">本はまだ登録されていません</div>';
+    } else {
+      [...readBooks].reverse().forEach(b => {
+        const row = document.createElement('div');
+        row.className = 'nova-list-item';
+        row.style.flexDirection = 'column';
+        row.style.alignItems = 'stretch';
+        const statusLabel = b.status === 'done' ? '読了' : '読書中';
+        row.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="nl-date">${b.dateAdded.slice(5).replace('-','/')}</div>
+            <div class="nl-main">${b.title}</div>
+            <button class="nova-chip status-toggle" style="border-color:#7a2b4a;color:#ff9ab8;">${statusLabel}</button>
+            <button class="nl-del">✕</button>
+          </div>
+          <textarea class="nova-review-box" placeholder="感想を書く...">${b.review || ''}</textarea>`;
+        row.querySelector('.status-toggle').addEventListener('click', () => {
+          b.status = b.status === 'done' ? 'reading' : 'done';
+          saveRead(readBooks);
+          renderRead();
+        });
+        row.querySelector('.nl-del').addEventListener('click', () => {
+          readBooks = readBooks.filter(x => x.id !== b.id);
+          saveRead(readBooks);
+          renderRead();
+        });
+        row.querySelector('.nova-review-box').addEventListener('change', (e) => {
+          b.review = e.target.value;
+          saveRead(readBooks);
+        });
+        readList.appendChild(row);
+      });
+    }
+    const thisYear = String(today.getFullYear());
+    const doneCount = readBooks.filter(b => b.status === 'done' && b.dateAdded.startsWith(thisYear)).length;
+    document.getElementById('read-stats').innerHTML = `今年の読了数: <b>${doneCount}冊</b>`;
+  }
+  document.getElementById('read-add').addEventListener('click', () => {
+    const titleEl = document.getElementById('read-title');
+    const statusEl = document.getElementById('read-status');
+    if(!titleEl.value.trim()) return;
+    const dateStr = readDate.value || ymd(today);
+    readBooks.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), title: titleEl.value.trim(), status: statusEl.value, dateAdded: dateStr, review: '' });
+    saveRead(readBooks);
+    renderRead();
+    titleEl.value = '';
+  });
+  // ============ end Nova Read ============
+
 })();
 </script>
 

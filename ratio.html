@@ -940,8 +940,8 @@
   .nova-fullscreen.theme-blue{ background: radial-gradient(ellipse at 50% -10%, #0e2a3a 0%, #040d12 55%), #030b10; }
   .nova-fullscreen.theme-rose{ background: radial-gradient(ellipse at 50% -10%, #3a0e22 0%, #12040a 55%), #100308; }
 
-  .theme-amber .nova-logo, .theme-amber .nova-card h4, .theme-amber #nova-back{ color:#ffb454 !important; }
-  .theme-amber #nova-back{ border-color:#7a5a26 !important; }
+  .theme-amber .nova-logo, .theme-amber .nova-card h4, .theme-amber #nova-back, .nova-back-btn{ color:#ffb454 !important; }
+  .theme-amber #nova-back, .nova-back-btn{ border-color:#7a5a26 !important; }
   .theme-amber .nova-card{ border-color:#3a2a0e !important; background:#160f05 !important; }
   .theme-amber .nova-btn-primary{ background:#3a2a0e !important; border-color:#ffb454 !important; color:#ffb454 !important; }
   .theme-amber .nova-row input, .theme-amber .nova-row select{ background:#231908 !important; border-color:#7a5a26 !important; }
@@ -949,8 +949,8 @@
   .theme-amber .nova-list-item{ border-color:#3a2a0e !important; }
   .theme-amber .nl-del, .theme-amber .nova-empty{ color:#a68a5c !important; }
 
-  .theme-purple .nova-logo, .theme-purple .nova-card h4, .theme-purple #nova-back{ color:#c9a6ff !important; }
-  .theme-purple #nova-back{ border-color:#5a3a8a !important; }
+  .theme-purple .nova-logo, .theme-purple .nova-card h4, .theme-purple #nova-back, .nova-back-btn{ color:#c9a6ff !important; }
+  .theme-purple #nova-back, .nova-back-btn{ border-color:#5a3a8a !important; }
   .theme-purple .nova-card{ border-color:#2a1a3a !important; background:#130a1a !important; }
   .theme-purple .nova-btn-primary{ background:#2a1a3a !important; border-color:#c9a6ff !important; color:#c9a6ff !important; }
   .theme-purple .nova-row input, .theme-purple .nova-row select{ background:#1c1128 !important; border-color:#5a3a8a !important; }
@@ -958,8 +958,8 @@
   .theme-purple .nova-list-item{ border-color:#2a1a3a !important; }
   .theme-purple .nl-del, .theme-purple .nova-empty{ color:#9a80c2 !important; }
 
-  .theme-blue .nova-logo, .theme-blue .nova-card h4, .theme-blue #nova-back{ color:#7fd4ff !important; }
-  .theme-blue #nova-back{ border-color:#1c6b8a !important; }
+  .theme-blue .nova-logo, .theme-blue .nova-card h4, .theme-blue #nova-back, .nova-back-btn{ color:#7fd4ff !important; }
+  .theme-blue #nova-back, .nova-back-btn{ border-color:#1c6b8a !important; }
   .theme-blue .nova-card{ border-color:#0e2a3a !important; background:#071a24 !important; }
   .theme-blue .nova-btn-primary{ background:#0e2a3a !important; border-color:#7fd4ff !important; color:#7fd4ff !important; }
   .theme-blue .nova-row input, .theme-blue .nova-row select{ background:#0a1e28 !important; border-color:#1c6b8a !important; }
@@ -967,8 +967,8 @@
   .theme-blue .nova-list-item{ border-color:#0e2a3a !important; }
   .theme-blue .nl-del, .theme-blue .nova-empty{ color:#6ba3bd !important; }
 
-  .theme-rose .nova-logo, .theme-rose .nova-card h4, .theme-rose #nova-back{ color:#ff9ab8 !important; }
-  .theme-rose #nova-back{ border-color:#7a2b4a !important; }
+  .theme-rose .nova-logo, .theme-rose .nova-card h4, .theme-rose #nova-back, .nova-back-btn{ color:#ff9ab8 !important; }
+  .theme-rose #nova-back, .nova-back-btn{ border-color:#7a2b4a !important; }
   .theme-rose .nova-card{ border-color:#3a0e22 !important; background:#16050d !important; }
   .theme-rose .nova-btn-primary{ background:#3a0e22 !important; border-color:#ff9ab8 !important; color:#ff9ab8 !important; }
   .theme-rose .nova-row input, .theme-rose .nova-row select{ background:#230a15 !important; border-color:#7a2b4a !important; }
@@ -980,7 +980,7 @@
     display:flex; align-items:center; gap:10px;
     margin-bottom:16px;
   }
-  #nova-back{
+  #nova-back, .nova-back-btn{
     background:none;
     border:1px solid #1f6b47;
     color:#4ade9a;
@@ -1395,7 +1395,7 @@
 
 <div id="nova-screen" class="nova-fullscreen theme-green">
   <div id="nova-head">
-    <button id="nova-back">‹ 設定</button>
+    <button id="nova-back" class="nova-back-btn">‹ 設定</button>
     <div>
       <div class="nova-logo">NOVA CARE</div>
       <div class="nova-sub">HEALTH MODULE</div>
@@ -1453,7 +1453,7 @@
 
 <div id="nova-weight-graph-screen" class="nova-fullscreen theme-green">
   <div id="nova-head">
-    <button id="nova-weight-graph-back">‹ Nova Care</button>
+    <button id="nova-weight-graph-back" class="nova-back-btn">‹ Nova Care</button>
     <div>
       <div class="nova-logo">WEIGHT</div>
       <div class="nova-sub">体重の推移</div>
@@ -1472,7 +1472,7 @@
 
 <div id="nova-wallet-screen" class="nova-fullscreen theme-amber">
   <div id="nova-head">
-    <button id="nova-wallet-back">‹ 設定</button>
+    <button id="nova-wallet-back" class="nova-back-btn">‹ 設定</button>
     <div>
       <div class="nova-logo">NOVA WALLET</div>
       <div class="nova-sub">家計簿</div>
@@ -1502,7 +1502,7 @@
 
 <div id="nova-wallet-monthly-screen" class="nova-fullscreen theme-amber">
   <div id="nova-head">
-    <button id="nova-wallet-monthly-back">‹ Nova Wallet</button>
+    <button id="nova-wallet-monthly-back" class="nova-back-btn">‹ Nova Wallet</button>
     <div>
       <div class="nova-logo">今月の記録</div>
       <div class="nova-sub">カテゴリ別集計</div>
@@ -1520,7 +1520,7 @@
 
 <div id="nova-habit-screen" class="nova-fullscreen theme-purple">
   <div id="nova-head">
-    <button id="nova-habit-back">‹ 設定</button>
+    <button id="nova-habit-back" class="nova-back-btn">‹ 設定</button>
     <div>
       <div class="nova-logo">NOVA HABIT</div>
       <div class="nova-sub">習慣管理</div>
@@ -1547,7 +1547,7 @@
 
 <div id="nova-fit-screen" class="nova-fullscreen theme-blue">
   <div id="nova-head">
-    <button id="nova-fit-back">‹ 設定</button>
+    <button id="nova-fit-back" class="nova-back-btn">‹ 設定</button>
     <div>
       <div class="nova-logo">NOVA FIT</div>
       <div class="nova-sub">トレーニング記録</div>
@@ -1573,7 +1573,7 @@
 
 <div id="nova-read-screen" class="nova-fullscreen theme-rose">
   <div id="nova-head">
-    <button id="nova-read-back">‹ 設定</button>
+    <button id="nova-read-back" class="nova-back-btn">‹ 設定</button>
     <div>
       <div class="nova-logo">NOVA READ</div>
       <div class="nova-sub">読書記録</div>
@@ -1867,8 +1867,8 @@
     taskAddImportant.checked = false;
     taskOverlay.classList.add('open');
   });
-  taskCloseBtn.addEventListener('click', () => taskOverlay.classList.remove('open'));
-  taskOverlay.addEventListener('click', (e) => { if(e.target === taskOverlay) taskOverlay.classList.remove('open'); });
+  taskCloseBtn.addEventListener('click', () => { taskOverlay.classList.remove('open'); backToSettingsCapability(); });
+  taskOverlay.addEventListener('click', (e) => { if(e.target === taskOverlay){ taskOverlay.classList.remove('open'); backToSettingsCapability(); } });
   function submitTaskAddForm(){
     if(taskInput.value.trim()){
       addTask(taskInput.value, taskAddDate.value, taskAddImportant.checked);
@@ -1984,6 +1984,13 @@
     if(novaReply !== null){
       addLine('jarvis', novaReply);
       speak(novaReply);
+      setState('idle');
+      return;
+    }
+    const usabilityReply = tryHandleAsUsabilityCommand(said);
+    if(usabilityReply !== null){
+      addLine('jarvis', usabilityReply);
+      speak(usabilityReply);
       setState('idle');
       return;
     }
@@ -2270,8 +2277,8 @@
     renderCalSelectedEvents();
     calOverlay.classList.add('open');
   });
-  calCloseBtn.addEventListener('click', () => calOverlay.classList.remove('open'));
-  calOverlay.addEventListener('click', (e) => { if(e.target === calOverlay) calOverlay.classList.remove('open'); });
+  calCloseBtn.addEventListener('click', () => { calOverlay.classList.remove('open'); backToSettingsCapability(); });
+  calOverlay.addEventListener('click', (e) => { if(e.target === calOverlay){ calOverlay.classList.remove('open'); backToSettingsCapability(); } });
 
   calPrevBtn.addEventListener('click', () => {
     if(calViewMode === 'week'){
@@ -2568,8 +2575,8 @@
   }
 
   memoBtn.addEventListener('click', () => { closeSettings(); memoOverlay.classList.add('open'); });
-  memoCloseBtn.addEventListener('click', () => memoOverlay.classList.remove('open'));
-  memoOverlay.addEventListener('click', (e) => { if(e.target === memoOverlay) memoOverlay.classList.remove('open'); });
+  memoCloseBtn.addEventListener('click', () => { memoOverlay.classList.remove('open'); backToSettingsCapability(); });
+  memoOverlay.addEventListener('click', (e) => { if(e.target === memoOverlay){ memoOverlay.classList.remove('open'); backToSettingsCapability(); } });
   memoAddBtn.addEventListener('click', () => {
     if(memoInput.value.trim()){
       addMemo(memoInput.value);
@@ -2671,8 +2678,8 @@
     updateReminderBtnState();
     reminderOverlay.classList.add('open');
   });
-  reminderCloseBtn.addEventListener('click', () => reminderOverlay.classList.remove('open'));
-  reminderOverlay.addEventListener('click', (e) => { if(e.target === reminderOverlay) reminderOverlay.classList.remove('open'); });
+  reminderCloseBtn.addEventListener('click', () => { reminderOverlay.classList.remove('open'); backToSettingsCapability(); });
+  reminderOverlay.addEventListener('click', (e) => { if(e.target === reminderOverlay){ reminderOverlay.classList.remove('open'); backToSettingsCapability(); } });
 
   reminderAddBtn.addEventListener('click', () => {
     if(!reminderTitle.value.trim()) return;
@@ -3061,6 +3068,11 @@
   // the Settings > Usability list (where all of these are launched from) rather than the home screen.
   function backToSettingsUsability(){
     showSettingsView('usability');
+    settingsOverlay.classList.add('open');
+  }
+  // Same idea for Capability items (Task/Calendar/Memo/Reminder panels).
+  function backToSettingsCapability(){
+    showSettingsView('capability');
     settingsOverlay.classList.add('open');
   }
 
@@ -3765,6 +3777,105 @@
     titleEl.value = '';
   });
   // ============ end Nova Read ============
+
+  // ============ Usability voice/text commands (free, pattern-based) ============
+  function tryHandleAsUsabilityCommand(said){
+    const s = said.trim();
+
+    // --- Nova Care: weight ---
+    let m = s.match(/体重(?:記録)?(?:を)?[、,。\s]*(\d+(?:\.\d+)?)\s*(?:kg|キロ)?/);
+    if(m){
+      const kg = parseFloat(m[1]);
+      if(addNovaWeight(ymd(today), kg)){
+        return `体重${kg}kgを記録しました。`;
+      }
+    }
+
+    // --- Nova Care: meal ---
+    m = s.match(/(?:食事|ご飯)(?:記録)?(?:を)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      addNovaMeal(ymd(today), m[1].trim(), null);
+      return `「${m[1].trim()}」を今日の食事に記録しました。`;
+    }
+    m = s.match(/^(.+?)を?食べた$/);
+    if(m && m[1] && m[1].trim()){
+      addNovaMeal(ymd(today), m[1].trim(), null);
+      return `「${m[1].trim()}」を今日の食事に記録しました。`;
+    }
+
+    // --- Nova Wallet: expense ---
+    m = s.match(/支出(?:記録)?(?:を)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      let body = m[1].trim();
+      const amtMatch = body.match(/(\d+)\s*円?/);
+      if(amtMatch){
+        const amount = parseInt(amtMatch[1], 10);
+        body = body.replace(amtMatch[0], '').trim();
+        let category = 'その他';
+        const foundCat = WALLET_CATEGORIES.find(c => body.includes(c));
+        if(foundCat){ category = foundCat; body = body.replace(foundCat, '').trim(); }
+        const memo = body.replace(/^[、,。\s]+|[、,。\s]+$/g, '');
+        walletEntries.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: ymd(today), category, amount, memo });
+        saveWallet(walletEntries);
+        renderWalletStats();
+        return `${category}に¥${amount.toLocaleString()}の支出を記録しました。`;
+      }
+      return '金額が聞き取れませんでした。「支出記録、500円、食費」のように話してください。';
+    }
+
+    // --- Nova Habit: add ---
+    m = s.match(/習慣(?:を)?追加(?:して)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      habits.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), name: m[1].trim(), doneDates: [] });
+      saveHabits(habits);
+      return `習慣「${m[1].trim()}」を追加しました。`;
+    }
+    // --- Nova Habit: mark done ---
+    m = s.match(/^(.+?)(?:を)?(?:達成|できた|やった)$/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const h = habits.find(x => x.name.includes(needle));
+      if(h){
+        const todayStr = ymd(today);
+        if(!h.doneDates.includes(todayStr)) h.doneDates.push(todayStr);
+        saveHabits(habits);
+        return `「${h.name}」を今日達成としてチェックしました。`;
+      }
+    }
+
+    // --- Nova Fit: training log ---
+    m = s.match(/トレーニング(?:記録)?(?:を)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      const parts = m[1].trim().split(/[、,]/).map(p => p.trim()).filter(Boolean);
+      const exercise = parts[0] || m[1].trim();
+      const detail = parts.slice(1).join(' ');
+      fitEntries.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), date: ymd(today), exercise, detail });
+      saveFit(fitEntries);
+      return `「${exercise}」の記録を追加しました。`;
+    }
+
+    // --- Nova Read: add book ---
+    m = s.match(/本(?:を)?追加(?:して)?[、,。\s]*(.+)/);
+    if(m && m[1] && m[1].trim()){
+      readBooks.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), title: m[1].trim(), status: 'reading', dateAdded: ymd(today), review: '' });
+      saveRead(readBooks);
+      return `「${m[1].trim()}」を読書リストに追加しました。`;
+    }
+    // --- Nova Read: mark finished ---
+    m = s.match(/^(.+?)を?読了$/);
+    if(m && m[1] && m[1].trim()){
+      const needle = m[1].trim();
+      const b = readBooks.find(x => x.title.includes(needle));
+      if(b){
+        b.status = 'done';
+        saveRead(readBooks);
+        return `「${b.title}」を読了にしました。`;
+      }
+    }
+
+    return null;
+  }
+  // ============ end Usability voice/text commands ============
 
 })();
 </script>
